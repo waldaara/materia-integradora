@@ -1,3 +1,7 @@
+## Language conventions
+
+Write code, identifiers, file names, directory names, and paths in English. Write comments, user-facing messages, and human-readable documentation in Spanish, including README prose, thesis chapters, and progress reports. Keep code examples, commands, and paths in English within Spanish prose.
+
 ## Agent skills
 
 ### Issue tracker
