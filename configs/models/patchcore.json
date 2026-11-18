@@ -1,0 +1,22 @@
+{
+  "model": "patchcore",
+  "params": {
+    "backbone": "wide_resnet50_2",
+    "layers": [
+      "layer2",
+      "layer3"
+    ],
+    "coreset_sampling_ratio": 0.1
+  },
+  "resize": 256,
+  "crop": null,
+  "train_batch_size": 1,
+  "max_epochs": 1,
+  "max_steps": -1,
+  "precision": "32-true",
+  "seeds": [
+    17,
+    29,
+    43
+  ]
+}

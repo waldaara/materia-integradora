@@ -1,0 +1,19 @@
+{
+  "model": "dinomaly",
+  "params": {
+    "encoder_name": "vit_base_patch14_reg4_dinov2",
+    "precision": "float32",
+    "decoder_depth": 8
+  },
+  "resize": 448,
+  "crop": 392,
+  "train_batch_size": 1,
+  "max_epochs": -1,
+  "max_steps": 5000,
+  "precision": "16-mixed",
+  "seeds": [
+    17,
+    29,
+    43
+  ]
+}

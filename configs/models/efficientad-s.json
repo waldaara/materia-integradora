@@ -1,0 +1,17 @@
+{
+  "model": "efficientad-s",
+  "params": {
+    "model_size": "small"
+  },
+  "resize": 256,
+  "crop": null,
+  "train_batch_size": 1,
+  "max_epochs": -1,
+  "max_steps": 70000,
+  "precision": "32-true",
+  "seeds": [
+    17,
+    29,
+    43
+  ]
+}

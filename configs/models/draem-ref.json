@@ -1,0 +1,15 @@
+{
+  "model": "draem-ref",
+  "params": {},
+  "resize": 256,
+  "crop": null,
+  "train_batch_size": 1,
+  "max_epochs": 700,
+  "max_steps": -1,
+  "precision": "32-true",
+  "seeds": [
+    17,
+    29,
+    43
+  ]
+}

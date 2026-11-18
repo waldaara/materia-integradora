@@ -1,0 +1,10 @@
+.DS_Store
+.env
+.env.*
+!.env.example
+.venv/
+.ipynb_checkpoints/
+__pycache__/
+/data/
+/artifacts/
+/datasets/
