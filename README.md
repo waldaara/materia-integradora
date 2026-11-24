@@ -25,6 +25,8 @@ El estudio compara PatchCore, EfficientAD-S, DRAEM y Dinomaly para detectar y lo
 | `data/` | Exportaciones, máscaras, datos públicos y pares sintéticos locales |
 | `artifacts/` | Pesos, registros, predicciones, imágenes de errores y tablas locales |
 | `docs/reports/` | Informes en español seleccionados para compartir |
+| `docs/thesis/` | Tesis en LaTeX, lista para comprimir y subir a Overleaf |
+| `docs/paper/` | Paper IEEE en LaTeX, lista para comprimir y subir a Overleaf |
 
 Los cuadernos crean los directorios de trabajo cuando los necesitan. Los datos privados, las credenciales y las salidas voluminosas quedan fuera de Git.
 

@@ -1,0 +1,1252 @@
+\documentclass[12pt,oneside]{report}
+
+% ---------------------------------------------------------------------
+%  Idioma y codificación
+% ---------------------------------------------------------------------
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish,es-tabla,es-nodecimaldot,es-noshorthands]{babel}
+
+% ---------------------------------------------------------------------
+%  Tipo y tamaño de letra: Times New Roman 12 pt (Norma APA)
+%  (Las indicaciones del Word usan Arial; se emplea Helvetica como equivalente.)
+% ---------------------------------------------------------------------
+\IfFileExists{newtxtext.sty}{%
+  \usepackage{newtxtext}\usepackage{newtxmath}}{%
+  \usepackage{mathptmx}}
+\usepackage[scaled=0.92]{helvet}
+
+% ---------------------------------------------------------------------
+%  Tamaño del papel y márgenes: A4, 2,54 cm por lado
+%  (El Word indica "A4 (21,59 cm x 27,94 cm)"; esas medidas corresponden
+%   a tamaño carta. Si su carrera exige carta, cambie a4paper por letterpaper.)
+% ---------------------------------------------------------------------
+\usepackage[a4paper,margin=2.54cm,headheight=15pt]{geometry}
+
+% ---------------------------------------------------------------------
+%  Paquetes generales
+% ---------------------------------------------------------------------
+\usepackage{setspace}          % interlineado doble; notas al pie a espacio sencillo
+\usepackage{ragged2e}          % texto alineado a la izquierda sin justificar
+\usepackage[table]{xcolor}
+\usepackage{array,booktabs,tabularx,multirow}
+\usepackage{enumitem}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{amsmath}
+\usepackage{tikz}
+\usepackage{pgf-pie}
+\usepackage{titlesec}
+\usepackage[titles]{tocloft}
+\usepackage{fancyhdr}
+\usepackage{calc}
+\usepackage{csquotes}
+\usepackage{cite}               % citas IEEE ordenadas y comprimidas: [2]--[4]
+\usepackage[hidelinks]{hyperref}
+\usepackage{xurl}
+\urlstyle{same}
+\usepackage{indentfirst}       % sangría también en el primer párrafo tras un título
+
+% Resaltado amarillo y subrayado (como en el Word)
+\newcommand{\resaltarcaja}[1]{\colorbox{yellow}{#1}}
+\IfFileExists{soul.sty}{%
+  \usepackage{soul}\sethlcolor{yellow}\let\resaltar\hl\let\subrayar\ul}{%
+  \let\resaltar\resaltarcaja\let\subrayar\underline}
+
+% ---------------------------------------------------------------------
+%  Texto: alineado a la izquierda, sangría 1,27 cm, interlineado doble,
+%  sin espacio entre párrafos
+% ---------------------------------------------------------------------
+\setlength{\parindent}{1.27cm}
+\setlength{\RaggedRightParindent}{1.27cm}
+\setlength{\parskip}{0pt}
+\doublespacing
+
+% Notas al pie: misma fuente, 2 pt más pequeña, interlineado sencillo
+\renewcommand{\footnotesize}{\fontsize{10}{12}\selectfont}
+
+% ---------------------------------------------------------------------
+%  Numeración de páginas: extremo superior derecho
+% ---------------------------------------------------------------------
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[R]{\thepage}
+\renewcommand{\headrulewidth}{0pt}
+\fancypagestyle{plain}{\fancyhf{}\fancyhead[R]{\thepage}\renewcommand{\headrulewidth}{0pt}}
+
+% ---------------------------------------------------------------------
+%  Niveles de título (Norma APA 7.ª ed.)
+%   Nivel 1: centrado y negrita                -> \chapter* / \encabezado
+%   Nivel 2: alineado a la izquierda y negrita -> \section
+%   Nivel 3: izquierda, cursiva y negrita      -> \subsection
+%   Nivel 4: sangría, negrita, punto final     -> \paragraph
+%   Nivel 5: sangría, negrita, cursiva, punto  -> \subparagraph
+% ---------------------------------------------------------------------
+\setcounter{secnumdepth}{2}
+\setcounter{tocdepth}{2}
+
+\titleformat{\chapter}[block]{\normalfont\normalsize\bfseries\centering}{}{0pt}{}
+\titlespacing*{\chapter}{0pt}{0pt}{0pt}
+\titleformat{\section}{\normalfont\normalsize\bfseries\raggedright}{\thesection}{0.6em}{}
+\titlespacing*{\section}{0pt}{0pt}{0pt}
+\titleformat{\subsection}{\normalfont\normalsize\bfseries\itshape\raggedright}{\thesubsection}{0.6em}{}
+\titlespacing*{\subsection}{0pt}{0pt}{0pt}
+\titleformat{\paragraph}[runin]{\normalfont\normalsize\bfseries}{}{0pt}{}[.]
+\titlespacing*{\paragraph}{1.27cm}{0pt}{0.5em}
+\titleformat{\subparagraph}[runin]{\normalfont\normalsize\bfseries\itshape}{}{0pt}{}[.]
+\titlespacing*{\subparagraph}{1.27cm}{0pt}{0.5em}
+
+% Encabezado de nivel 1 sin numeración (Resumen, Referencias, etc.)
+% #1 = texto; con * no se agrega al índice
+\makeatletter
+\newcommand{\encabezado}{\@ifstar{\@encabezadoS}{\@encabezadoN}}
+\newcommand{\@encabezadoN}[1]{%
+  \phantomsection\addcontentsline{toc}{chapter}{#1}%
+  {\centering\bfseries #1\par}}
+\newcommand{\@encabezadoS}[1]{{\centering\bfseries #1\par}}
+\makeatother
+
+% Encabezado con línea inferior (Dedicatoria, Agradecimientos, Declaración Expresa)
+\newcommand{\encabezadolinea}[1]{%
+  {\centering\bfseries #1\par}\vspace{-0.6\baselineskip}\noindent\rule{\textwidth}{0.6pt}\par}
+
+% ---------------------------------------------------------------------
+%  Capítulos:
+%  La primera página de cada capítulo ("Capítulo N") no lleva numeración
+%  visible pero sí cuenta en la secuencia.
+%  Uso: \capitulo[nota opcional en la portadilla]{Título del capítulo}
+% ---------------------------------------------------------------------
+\newcommand{\capitulo}[2][]{%
+  \clearpage
+  \refstepcounter{chapter}%
+  \thispagestyle{empty}%
+  \phantomsection
+  \addcontentsline{toc}{chapter}{Capítulo \thechapter}%
+  \vspace*{\fill}
+  {\centering\bfseries Capítulo \thechapter\par}
+  \if\relax\detokenize{#1}\relax\else
+    \bigskip{\noindent #1\par}
+  \fi
+  \vspace*{\fill}
+  \clearpage
+  \phantomsection
+  \addcontentsline{toc}{chapter}{\thechapter.\hspace{1em}#2}%
+  {\noindent\bfseries\thechapter.\hspace{0.6em}#2\par}}
+
+% ---------------------------------------------------------------------
+%  Índices (índice general, de figuras y de tablas)
+% ---------------------------------------------------------------------
+\addto\captionsspanish{%
+  \renewcommand{\contentsname}{Índice general}%
+  \renewcommand{\listfigurename}{Índice de figuras}%
+  \renewcommand{\listtablename}{Índice de tablas}%
+  \renewcommand{\figurename}{Figura}%
+  \renewcommand{\tablename}{Tabla}}
+
+\renewcommand{\cfttoctitlefont}{\hfill\normalsize\bfseries}
+\renewcommand{\cftaftertoctitle}{\hfill}
+\renewcommand{\cftloftitlefont}{\hfill\normalsize\bfseries}
+\renewcommand{\cftafterloftitle}{\hfill}
+\renewcommand{\cftlottitlefont}{\hfill\normalsize\bfseries}
+\renewcommand{\cftafterlottitle}{\hfill}
+\setlength{\cftbeforetoctitleskip}{0pt}
+\setlength{\cftbeforeloftitleskip}{0pt}
+\setlength{\cftbeforelottitleskip}{0pt}
+\setlength{\cftaftertoctitleskip}{\baselineskip}
+\setlength{\cftafterloftitleskip}{\baselineskip}
+\setlength{\cftafterlottitleskip}{\baselineskip}
+
+\renewcommand{\cftchapfont}{\normalfont}
+\renewcommand{\cftchappagefont}{\normalfont}
+\renewcommand{\cftchapleader}{\cftdotfill{\cftdotsep}}
+\setlength{\cftbeforechapskip}{0pt}
+\setlength{\cftchapnumwidth}{0pt}
+
+\renewcommand{\cftfigpresnum}{Figura~}
+\renewcommand{\cftfigaftersnum}{.}
+\setlength{\cftfignumwidth}{5.5em}
+\setlength{\cftfigindent}{0pt}
+\renewcommand{\cfttabpresnum}{Tabla~}
+\renewcommand{\cfttabaftersnum}{.}
+\setlength{\cfttabnumwidth}{5em}
+\setlength{\cfttabindent}{0pt}
+
+% ---------------------------------------------------------------------
+%  Figuras y tablas (Norma APA):
+%  número en negrita; título descriptivo en cursiva en la línea siguiente;
+%  ambos encima del contenido. Numeración consecutiva (1, 2, 3...).
+% ---------------------------------------------------------------------
+\counterwithout{figure}{chapter}
+\counterwithout{table}{chapter}
+\captionsetup{labelfont=bf,textfont=it,labelsep=newline,
+  justification=raggedright,singlelinecheck=false,skip=4pt,font=normalsize}
+\captionsetup[figure]{position=top}
+\captionsetup[table]{position=top}
+% Nota debajo de figuras y tablas
+\newcommand{\nota}[1]{\par\noindent\textit{Nota}. #1\par}
+
+% Párrafo destacado (negrita y cursiva con sangría), usado en el Word
+\newenvironment{destacado}{\par\begin{list}{}{\leftmargin=1.27cm\rightmargin=0pt}\item\relax\bfseries\itshape}{\end{list}}
+
+% Referencias con sangría francesa de 1,27 cm
+\newenvironment{referencias}{\par\begin{list}{}{%
+  \leftmargin=1.27cm\itemindent=-1.27cm\listparindent=0pt
+  \itemsep=0pt\parsep=0pt\topsep=0pt}}{\end{list}}
+\newcommand{\referencia}{\item[]}
+
+% Listas
+\setlist{nosep}
+\setlist[itemize]{label=\textbullet}
+
+% Firmas
+\newcommand{\firma}[2]{%
+  \begin{minipage}[t]{0.42\textwidth}\centering\singlespacing
+    \rule{\linewidth}{0.5pt}\\ #1\\ #2
+  \end{minipage}}
+
+% Colores del gráfico de ejemplo (paleta de Office)
+\definecolor{ofAzulClaro}{HTML}{5B9BD5}\definecolor{ofNaranja}{HTML}{ED7D31}
+\definecolor{ofGris}{HTML}{A5A5A5}\definecolor{ofAmarillo}{HTML}{FFC000}
+\definecolor{ofAzul}{HTML}{4472C4}
+
+\hypersetup{pdftitle={Desarrollo de una plataforma inteligente para la detección y localización de anomalías visuales en componentes industriales mediante aprendizaje profundo},pdfauthor={Walter David Aragundy Yánez; David Andrés Luna Tenecela},pdfsubject={Proyecto Integrador, ESPOL}}
+
+% =====================================================================
+\begin{document}
+\RaggedRight
+
+% ---------------------------------------------------------------------
+%  CARÁTULA (sin numeración)
+% ---------------------------------------------------------------------
+\pagenumbering{gobble}
+\pagestyle{empty}
+\begin{center}
+\onehalfspacing
+\vspace*{1.5cm}
+{\bfseries Escuela Superior Politécnica del Litoral\par}
+\vspace{0.8cm}
+{\bfseries Facultad de Ingeniería en Electricidad y Computación\par}
+\vspace{1.2cm}
+{\bfseries Título del trabajo\par}
+Desarrollo de una plataforma inteligente para la detección y localización de anomalías visuales en componentes industriales mediante aprendizaje profundo\par
+\vspace{0.4cm}
+{\bfseries Proyecto Integrador\par}
+\vspace{0.4cm}
+Previo la obtención del Título de:\par
+\vspace{0.4cm}
+{\bfseries Ingeniero en Ciencias Computacionales\par}
+\vspace{1.5cm}
+{\bfseries Presentado por:\par}
+Walter David Aragundy Yánez\par
+David Andrés Luna Tenecela\par
+\vspace{1.5cm}
+Guayaquil - Ecuador\par
+Año: 2026\par
+\end{center}
+
+% ---------------------------------------------------------------------
+%  DEDICATORIA (sin numeración)
+% ---------------------------------------------------------------------
+\clearpage
+\encabezadolinea{Dedicatoria}
+\vspace*{\fill}
+\hfill
+\begin{minipage}{0.45\textwidth}
+\RaggedRight\setlength{\parindent}{0pt}\setlength{\parskip}{6pt}
+La dedicatoria va sin tabulación a la derecha y no debe pasar de una carilla.
+
+En esta página se menciona a las personas o instituciones a las que se desea dedicar el producto final del trabajo.
+
+Puede empezar de la siguiente manera:
+
+El presente proyecto lo dedico a...
+
+\textbf{Esta parte es opcional.}
+\end{minipage}
+\vspace*{\fill}
+
+% ---------------------------------------------------------------------
+%  AGRADECIMIENTOS (sin numeración)
+% ---------------------------------------------------------------------
+\clearpage
+\encabezadolinea{Agradecimientos}
+\vspace*{\fill}
+\hfill
+\begin{minipage}{0.45\textwidth}
+\RaggedRight\setlength{\parindent}{0pt}\setlength{\parskip}{6pt}
+Los agradecimientos van sin tabulación a la derecha y no deben pasar de una carilla. Serán realizados a individuos o instituciones que no se mencionan en el documento y quienes han realizado importantes contribuciones para la consecución del trabajo. Puede empezar de la siguiente manera:
+
+Mi más sincero agradecimiento a...
+
+\textbf{(Esta parte puede ser opcional)}
+\end{minipage}
+\vspace*{\fill}
+
+% ---------------------------------------------------------------------
+%  DECLARACIÓN EXPRESA (sin numeración; puede cambiar el interlineado
+%  para que no sobrepase una página)
+% ---------------------------------------------------------------------
+\clearpage
+\encabezadolinea{Declaración Expresa}
+\begingroup
+\onehalfspacing
+\justifying
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+\small
+\vspace{0.5cm}
+
+Yo/Nosotros (nombre del o los estudiantes completos) acuerdo/acordamos y reconozco/reconocemos que:
+
+La titularidad de los derechos patrimoniales de autor (derechos de autor) del proyecto de graduación corresponderá al autor o autores, sin perjuicio de lo cual la ESPOL recibe en este acto una licencia gratuita de plazo indefinido para el uso no comercial y comercial de la obra con facultad de sublicenciar, incluyendo la autorización para su divulgación, así como para la creación y uso de obras derivadas. En el caso de usos comerciales se respetará el porcentaje de participación en beneficios que corresponda a favor del autor o autores.
+
+La titularidad total y exclusiva sobre los derechos patrimoniales de patente de invención, modelo de utilidad, diseño industrial, secreto industrial, software o información no divulgada que corresponda o pueda corresponder respecto de cualquier investigación, desarrollo tecnológico o invención realizada por mí/nosotros durante el desarrollo del proyecto de graduación, pertenecerán de forma total, exclusiva e indivisible a la ESPOL, sin perjuicio del porcentaje que me/nos corresponda de los beneficios económicos que la ESPOL reciba por la explotación de mi/nuestra innovación, de ser el caso.
+
+En los casos donde la Oficina de Transferencia de Resultados de Investigación (OTRI) de la ESPOL comunique al/los autor/es que existe una innovación potencialmente patentable sobre los resultados del proyecto de graduación, no se realizará publicación o divulgación alguna, sin la autorización expresa y previa de la ESPOL.
+
+Guayaquil, \rule{3.5cm}{0.4pt} del 202X.
+
+\vspace{2cm}
+\noindent\firma{Autor 1}{}\hfill\firma{Autor 2}{}
+\endgroup
+
+% ---------------------------------------------------------------------
+%  EVALUADORES (sin numeración)
+% ---------------------------------------------------------------------
+\clearpage
+\encabezado*{Evaluadores}
+\vspace{4cm}
+\noindent\firma{\textbf{Ph.D. Lucía Marisol Villacrés Falconi}}{Profesor de Materia}\hfill
+\firma{\textbf{Ph.D. Patricia Leonor Suárez Riofrío}}{Tutor de Proyecto}
+
+\bigskip
+
+% ---------------------------------------------------------------------
+%  PÁGINAS PRELIMINARES CON NUMERACIÓN ROMANA (I, II, III...)
+% ---------------------------------------------------------------------
+\clearpage
+\pagenumbering{Roman}
+\pagestyle{fancy}
+
+% ---------------------------- RESUMEN --------------------------------
+\encabezado{Resumen}
+\noindent Estas instrucciones servirán de guía para la preparación de los trabajos que se presentarán como requisito en el proceso de graduación de la Materia Integradora de la Unidad Académica. El resumen deberá contener entre \resaltar{150 a 200 palabras}, incluyendo los siguientes cuatro componentes, descritos de forma concisa, comprensible y \textbf{redactado en estilo impersonal (tercera persona)}: 1) se empieza con una breve introducción, objetivos, hipótesis y justificación del proyecto descrito en \textbf{tiempo presente}; 2) desarrollo del proyecto, donde se describirán brevemente los materiales, equipos, técnicas, normas etc. utilizadas en el proyecto. Esta sección se redacta en \textbf{tiempo pasado}; 3) continúe con los resultados donde se describen de forma concisa solo los principales y más novedosos resultados escritos en \textbf{tiempo pasado}; 4) finalmente, se presentan las conclusiones generales del proyecto en \textbf{tiempo presente}. Además, deberá incluir al menos 4 palabras clave al final del documento. Todo el resumen se presentará en un sólo cuerpo. Utilice el contador de palabras del procesador de texto para asegurarse del tamaño del documento.
+
+\noindent\textbf{Palabras Clave:} Formato, Proyecto Integrador, etc. (mínimo 4 y máximo 5 palabras).
+
+\noindent Procure que las palabras claves que aquí coloque no repitan las que ya se encuentran incluidas en su título.
+
+% ---------------------------- ABSTRACT -------------------------------
+\clearpage
+\phantomsection\addcontentsline{toc}{chapter}{\textit{Abstract}}
+{\centering\bfseries\itshape Abstract\par}
+\noindent\textit{Use English to write the same as described before in the Resumen. Use cursive fonts in this section.}
+
+\noindent\textit{Keywords:}
+
+% ------------------------- ÍNDICE GENERAL ----------------------------
+\clearpage
+\phantomsection\addcontentsline{toc}{chapter}{Índice general}
+\begingroup\singlespacing
+\setlength{\cftbeforesecskip}{4pt}\setlength{\cftbeforesubsecskip}{4pt}\setlength{\cftbeforechapskip}{4pt}
+\tableofcontents
+\endgroup
+
+% -------------------------- ABREVIATURAS -----------------------------
+\clearpage
+\phantomsection\addcontentsline{toc}{chapter}{Abreviaturas}
+{\centering\textbf{Abreviaturas}\par}
+\begingroup\singlespacing\renewcommand{\arraystretch}{1.25}
+\noindent\begin{tabular}{@{}p{3cm}p{12cm}}
+AP & Precisión promedio (\textit{Average Precision}) \\
+AU-PRO & Área bajo la curva de solapamiento por región \\
+AUROC & Área bajo la curva ROC \\
+BF16 & Formato de punto flotante \textit{bfloat16} \\
+CC BY-NC-SA & Licencia Creative Commons Atribución-NoComercial-CompartirIgual \\
+CIIU & Clasificación Industrial Internacional Uniforme \\
+CVAT & \textit{Computer Vision Annotation Tool} \\
+DRAEM & \textit{Discriminatively trained Reconstruction Anomaly Embedding Model} \\
+ESPOL & Escuela Superior Politécnica del Litoral \\
+FID & \textit{Fréchet Inception Distance} \\
+FP16 & Punto flotante de 16 bits \\
+FP32 & Punto flotante de 32 bits \\
+FPR & Tasa de falsos positivos (\textit{False Positive Rate}) \\
+GPU & Unidad de procesamiento gráfico \\
+I-AP & Precisión promedio por imagen \\
+I-AUROC & AUROC por imagen \\
+IoU & Intersección sobre la unión \\
+KID & \textit{Kernel Inception Distance} \\
+LPIPS & \textit{Learned Perceptual Image Patch Similarity} \\
+ODS & Objetivos de Desarrollo Sostenible \\
+P-AP & Precisión promedio por píxel \\
+P-AUROC & AUROC por píxel \\
+PRO & Solapamiento por región (\textit{Per-Region Overlap}) \\
+RAM & Memoria de acceso aleatorio \\
+ROC & Característica operativa del receptor (\textit{Receiver Operating Characteristic}) \\
+TEST & Subconjunto de prueba \\
+TRAIN & Subconjunto de entrenamiento \\
+VAL & Subconjunto de validación \\
+ViT & Transformer de visión (\textit{Vision Transformer}) \\
+\end{tabular}
+\endgroup
+
+% --------------------------- SIMBOLOGÍA ------------------------------
+\clearpage
+\phantomsection\addcontentsline{toc}{chapter}{Simbología}
+{\centering\textbf{Simbología}\par}
+\begingroup\singlespacing\renewcommand{\arraystretch}{1.25}
+\noindent\begin{tabular}{@{}p{3cm}p{12cm}}
+$A$, $B$ & Máscaras de dos anotadores \\
+$C_k$ & $k$-ésima región defectuosa de referencia \\
+$F_1$ & Puntuación F1 \\
+$K$ & Número de regiones defectuosas de referencia \\
+$\mathcal{M}$ & Banco de memoria de características normales de PatchCore \\
+$m$ & Elemento del banco de memoria \\
+$n^{+}$, $n^{-}$ & Número de imágenes defectuosas y normales \\
+$P$, $R$ & Precisión y exhaustividad \\
+$P_n$, $R_n$ & Precisión y exhaustividad en el $n$-ésimo umbral \\
+$\mathcal{P}(x)$ & Conjunto de características de parches de la imagen $x$ \\
+$P_t$ & Píxeles predichos como anómalos con el umbral $t$ \\
+$p$ & Característica de un parche \\
+$p_o$, $p_e$ & Acuerdo observado y acuerdo esperado por azar \\
+p50, p95 & Percentiles 50 y 95 de la latencia \\
+$Q$ & Métrica primaria de localización \\
+$s(x)$ & Puntuación de anomalía de la imagen $x$ \\
+$t$ & Umbral de decisión \\
+$x$ & Imagen de entrada \\
+$\Delta_{\mathrm{sint}}$ & Efecto de las anomalías sintéticas externas en DRAEM \\
+$\kappa$ & Coeficiente kappa de Cohen \\
+$\tau$ & Coeficiente de correlación de rangos de Kendall \\
+GB & Gigabyte \\
+ms & Milisegundo \\
+px & Píxel \\
+s & Segundo \\
+\end{tabular}
+\endgroup
+
+% ----------------------- ÍNDICE DE FIGURAS ---------------------------
+\clearpage
+\phantomsection\addcontentsline{toc}{chapter}{Índice de figuras}
+\listoffigures
+% Las figuras que inserte con \begin{figure}...\caption{...} aparecerán aquí
+% con el formato: Figura 1. Ejemplo de Figura ........ 10
+
+% ------------------------ ÍNDICE DE TABLAS ---------------------------
+\clearpage
+\phantomsection\addcontentsline{toc}{chapter}{Índice de tablas}
+\listoftables
+
+% =====================================================================
+%  CUERPO DEL DOCUMENTO — numeración arábiga desde el Capítulo 1
+% =====================================================================
+\clearpage
+\pagenumbering{arabic}
+
+% =====================================================================
+%  CAPÍTULO 1 — Introducción
+%  Revisado según las observaciones de la tutora (Avance 2) y alineado con
+%  la ficha registrada y el protocolo de arquitecturas v1.1.
+%  Las citas usan \cite{clave}; la lista está en la sección Referencias
+%  (norma IEEE, numeradas por orden de aparición). Compile dos veces.
+% =====================================================================
+\providecommand{\pendiente}[1]{\resaltarcaja{[#1]}}
+
+\capitulo{Introducción}
+
+La inspección de calidad basada en imágenes es una de las aplicaciones más extendidas de la visión por computador en la industria manufacturera. Su propósito es identificar irregularidades en objetos fabricados antes de que lleguen al cliente, complementando o reemplazando la revisión manual, que resulta lenta, costosa y dependiente del criterio y la fatiga de cada operario \cite{czimmermann2020}. En líneas de producción con grandes volúmenes, un defecto no detectado a tiempo se traduce en devoluciones, desperdicio de material y pérdida de confianza del cliente.
+
+El problema técnico de fondo es que los defectos son escasos por naturaleza. Una línea bien controlada genera muchas más piezas correctas que defectuosas, y los defectos que aparecen suelen ser pequeños, variados e imprevisibles. Por ello, los clasificadores supervisados, que requieren muchos ejemplos etiquetados de cada tipo de defecto, son difíciles de entrenar y validar. La detección de anomalías aborda esta limitación desde otro ángulo: construye una representación de lo normal a partir de piezas correctas y señala como anómala toda desviación significativa, sin requerir un catálogo exhaustivo de defectos \cite{chandola2009,ruff2021,pang2021}.
+
+Los métodos de aprendizaje profundo para esta tarea han alcanzado resultados muy altos en conjuntos de referencia públicos como MVTec AD \cite{bergmann2019,bergmann2021} y VisA \cite{zou2022}, y diversas revisiones documentan su evolución en el contexto industrial \cite{liu2024}. Sin embargo, ese desempeño no se transfiere automáticamente a un producto concreto: cada objeto tiene su propia geometría, textura, iluminación y proceso de captura. MVTec AD 2 evidencia que métodos con desempeño casi perfecto en los escenarios clásicos se degradan ante defectos muy pequeños y cambios de iluminación \cite{heckler2026}. A esto se suma una pregunta abierta: si la escasez de defectos reales puede compensarse con imágenes sintéticas y en qué condiciones esas imágenes ayudan a generalizar sobre piezas reales.
+
+El proyecto aborda estas preguntas en componentes industriales y toma como caso de estudio las tapas industriales de un proyecto previo del grupo con una empresa del sector manufacturero. Su resultado es doble. El primer entregable es una evaluación experimental comparativa de cuatro arquitecturas de aprendizaje profundo de paradigmas complementarios, entrenadas y evaluadas con imágenes reales anotadas y con imágenes sintéticas. El segundo es una plataforma funcional de inspección visual que integra los modelos seleccionados y permite cargar una imagen, obtener una puntuación de anomalía y visualizar el mapa que localiza el defecto. En conjunto, la plataforma integra modelos, imágenes reales anotadas y sintéticas, evaluación comparativa y visualización de resultados.
+
+Desde el punto de vista formativo, el proyecto integra competencias de la carrera de Computación: aprendizaje profundo, procesamiento de imágenes, ingeniería de datos, diseño experimental y desarrollo de \textit{software}. Su alcance es un prototipo validado sobre el caso de estudio, no una solución comercial certificada para su despliegue en planta.
+
+El presente capítulo describirá el problema, su justificación, los objetivos y el marco teórico. El Capítulo 2 detallará la metodología: selección de arquitecturas, datos, síntesis, diseño experimental y diseño funcional de la plataforma. El Capítulo 3 presentará los resultados y el Capítulo 4, las conclusiones y recomendaciones.
+
+\section{Descripción del problema}
+
+La detección de anomalías visuales en componentes industriales presenta dificultades debido a la variabilidad de los defectos y la escasez de muestras defectuosas anotadas. Se requiere evaluar arquitecturas de aprendizaje profundo y el aporte de datos sintéticos para mejorar la inspección visual automatizada.
+
+En el caso de estudio, la inspección de tapas exige identificar defectos sutiles y de tamaño reducido: marcas superficiales, defectos de borde, deformaciones, cambios locales de apariencia o irregularidades de fabricación. Esta taxonomía preliminar se confirma sobre la colección real antes de cerrarse. Las imágenes provienen del proyecto previo con la empresa colaboradora y fueron capturadas con \pendiente{cámara, iluminación y resolución}. Se dispone de \pendiente{N} imágenes reales con anotaciones previas, de las cuales \pendiente{N} son defectuosas y \pendiente{N} cuentan con máscara a nivel de píxel; el proyecto consolida y revisa esas anotaciones. Existe, además, un trabajo previo del grupo orientado a generar imágenes sintéticas de tapas.
+
+El problema presenta las siguientes restricciones:
+
+\begin{itemize}
+  \item \textbf{Desbalance de datos.} Las imágenes de tapas correctas superan ampliamente a las defectuosas, lo que dificulta entrenar y, sobre todo, validar modelos \cite{pang2021}.
+  \item \textbf{Variabilidad de captura.} Cambios de iluminación, posición, cámara o lote alteran la apariencia de piezas normales, y un modelo puede confundirlos con defectos \cite{heckler2026}.
+  \item \textbf{Defectos pequeños y heterogéneos.} Las anomalías pueden ocupar una fracción mínima de la imagen y no siguen un patrón único \cite{czimmermann2020}.
+  \item \textbf{Brecha entre lo sintético y lo real.} Una imagen sintética visualmente plausible no necesariamente mejora la detección sobre defectos reales \cite{tobin2017}.
+  \item \textbf{Recursos de cómputo limitados.} Una sola unidad de procesamiento gráfico (GPU) de 11 GB condiciona el tamaño de lote, la precisión numérica y la variante de cada modelo (Capítulo 2).
+\end{itemize}
+
+La literatura ofrece arquitecturas con enfoques distintos: características preentrenadas comparadas contra un banco de parches normales \cite{roth2022}, reconstrucción discriminativa con anomalías simuladas \cite{zavrtanik2021}, esquemas compactos de baja latencia \cite{batzner2024} y reconstrucción de características con Transformers autosupervisados \cite{guo2025}. El desempeño reportado en conjuntos de referencia no permite inferir cómo responde cada una ante tapas con geometría, iluminación y adquisición propias.
+
+En consecuencia, el problema consiste en determinar qué arquitecturas ofrecen el mejor compromiso entre detección, localización, robustez y costo computacional en este dominio; si el uso controlado de imágenes sintéticas mejora los resultados cuando los defectos reales son escasos; y cómo integrar los modelos seleccionados en una herramienta que muestre al inspector dónde está el defecto. Responder exige imágenes correctamente anotadas, particiones sin filtración de información y una evaluación final exclusivamente con imágenes reales no vistas.
+
+\begin{destacado}
+Pregunta de investigación: ¿en qué medida la selección de la arquitectura y el uso de imágenes reales y sintéticas modifican la eficacia y la capacidad de generalización de la detección y localización de anomalías en tapas industriales?
+\end{destacado}
+
+\section{Justificación del problema}
+
+La escasez de defectos anotados es la razón central del estudio. Como no hay suficientes ejemplos reales para entrenar clasificadores supervisados, el proyecto compara métodos entrenados con piezas normales y mide, con una comparación controlada entre datos reales y sintéticos, si las anomalías generadas compensan esa escasez. El estudio no supone que la síntesis resuelva el problema: un resultado negativo que delimite cuándo no aporta también es una contribución válida.
+
+La plataforma está dirigida al personal de control de calidad y a los ingenieros de proceso que deciden si una pieza se acepta o se rechaza. Para ellos, la visualización del mapa de anomalía añade lo que una puntuación global no ofrece: indica dónde está la región sospechosa. Así, el inspector puede verificar la decisión del modelo, descartar falsos positivos y documentar el tipo y la ubicación del defecto. Esta salida corresponde a la tarea de localización por píxel que distinguen los conjuntos de referencia industriales \cite{bergmann2021}.
+
+En la dimensión metodológica, una evaluación transparente evita conclusiones dominadas por diferencias accidentales entre experimentos. La filtración de información entre entrenamiento y prueba es una causa documentada de resultados sobrestimados en ciencia basada en aprendizaje automático \cite{kapoor2023}.
+
+El proyecto se enmarca en el Objetivo de Desarrollo Sostenible (ODS) 9, Industria, innovación e infraestructura, cuya meta 9.5 plantea aumentar la investigación científica y mejorar la capacidad tecnológica de los sectores industriales \cite{un2015}. Su sector productivo es el de industrias manufactureras, que corresponde a la sección C de la Clasificación Industrial Internacional Uniforme (CIIU) \cite{un2008isic}.
+
+\section{Objetivos}
+
+\subsection{Objetivo general}
+
+Desarrollar una plataforma inteligente que detecte y localice anomalías visuales en componentes industriales mediante la integración de modelos de aprendizaje profundo y conjuntos de imágenes reales y sintéticas.
+
+\subsection{Objetivos específicos}
+
+\begin{enumerate}[leftmargin=2cm]
+  \item Construir un conjunto de datos de anomalías visuales en tapas industriales, mediante la consolidación de anotaciones de imágenes reales existentes y la generación sintética de muestras defectuosas asistida por inteligencia artificial.
+  \item Evaluar comparativamente arquitecturas de aprendizaje profundo para la detección y localización de anomalías visuales, mediante experimentos controlados con imágenes reales y sintéticas.
+  \item Implementar una plataforma inteligente de inspección visual que integre las arquitecturas seleccionadas, para la detección y localización de anomalías en componentes industriales.
+\end{enumerate}
+
+La selección de arquitecturas, la validación de datos, las particiones y las ablaciones se desarrollan como actividades de la metodología (Capítulo 2).
+
+\section{Marco teórico}
+
+\subsection{Detección y localización de anomalías visuales}
+
+Una anomalía es un patrón que no se ajusta a la noción de comportamiento normal de los datos \cite{chandola2009}. En inspección industrial se distinguen dos tareas con unidades de análisis distintas \cite{bergmann2021}. La \textbf{detección} opera sobre la imagen: asigna a cada una una puntuación global de anomalía y apoya la decisión de aceptar o rechazar la pieza. La \textbf{localización} opera sobre los píxeles: produce un mapa espacial de las regiones defectuosas y apoya la verificación de dónde está el defecto.
+
+El aprendizaje en este dominio suele ser semisupervisado: el modelo se entrena solo con ejemplos normales y aprende a reconocer lo que se aparta de ellos \cite{ruff2021}. Algunos métodos incorporan defectos artificiales como señal auxiliar de entrenamiento \cite{zavrtanik2021,li2021}.
+
+\subsection{Familias de arquitecturas}
+
+Los métodos de detección de anomalías visuales pueden agruparse según la forma en que modelan la normalidad \cite{liu2024}.
+
+\paragraph{Métodos basados en características de parches} Extraen representaciones de cada región con una red preentrenada en otro dominio, típicamente ResNet o Wide ResNet sobre ImageNet \cite{he2016,zagoruyko2016,deng2009}, y las comparan con un modelo de la normalidad. Rippel y colaboradores modelaron las características normales con una distribución gaussiana \cite{rippel2020}, y PaDiM, con una distribución por posición de parche \cite{defard2021}. PatchCore construye un banco de memoria $\mathcal{M}$ con características de parches normales, reducido mediante submuestreo, y asigna a una imagen $x$ la distancia del parche más atípico a su vecino más cercano \cite{roth2022}:
+\begin{equation}
+  s(x) = \max_{p \in \mathcal{P}(x)} \; \min_{m \in \mathcal{M}} \left\lVert p - m \right\rVert_2
+\end{equation}
+donde $\mathcal{P}(x)$ es el conjunto de características de parches de $x$. La distancia de cada parche, reproyectada sobre la imagen, produce el mapa de anomalía.
+
+\paragraph{Métodos reconstructivos y discriminativos} Contrastan la imagen con una reconstrucción de su versión normal o aprenden a distinguir regiones normales de anomalías simuladas. CutPaste recorta y pega parches de la propia imagen \cite{li2021}. El modelo de incrustación de anomalías por reconstrucción entrenado de forma discriminativa (DRAEM) combina una subred de reconstrucción con una subred discriminativa entrenada con anomalías que el propio método genera a partir de ruido de Perlin y texturas externas \cite{zavrtanik2021,perlin1985}.
+
+\paragraph{Métodos basados en destilación} Emplean esquemas de profesor y estudiante, donde la discrepancia entre ambas redes indica una anomalía \cite{bergmann2020,deng2022}. EfficientAD lleva el enfoque a redes compactas con latencias del orden de milisegundos \cite{batzner2024}.
+
+\paragraph{Métodos de reconstrucción de características con Transformers} Emplean Transformers de visión (ViT) \cite{dosovitskiy2021} preentrenados de forma autosupervisada, como DINOv2 \cite{oquab2024}. Dinomaly usa un codificador DINOv2 con registros \cite{darcet2024}, un cuello de botella y un decodificador Transformer; la anomalía se deriva de la discrepancia entre las representaciones del codificador y las reconstruidas \cite{guo2025}.
+
+La Tabla \ref{tab:roles} resume el papel de cada arquitectura en el estudio y los datos que requiere para entrenar.
+
+\begin{table}[H]
+\singlespacing\setlength{\parindent}{0pt}\setlength{\RaggedRightParindent}{0pt}
+\caption{Papel de cada arquitectura y datos que requiere para entrenar}
+\label{tab:roles}
+\begin{tabularx}{\textwidth}{@{}>{\RaggedRight\arraybackslash}p{2.6cm}>{\RaggedRight\arraybackslash}X>{\RaggedRight\arraybackslash}X@{}}
+\toprule
+Arquitectura & Papel en el estudio & Datos para entrenar \\
+\midrule
+PatchCore \cite{roth2022} & Control basado en memoria de características & Solo imágenes normales; no ajusta pesos \\
+EfficientAD-S \cite{batzner2024} & Eje de eficiencia y latencia & Imágenes normales; la implementación usa además ImageNette como penalización auxiliar \cite{akcay2022} \\
+DRAEM \cite{zavrtanik2021} & Valor de las anomalías sintetizadas & Imágenes normales y pseudoanomalías generadas internamente \\
+Dinomaly \cite{guo2025} & Representante Transformer reciente & Imágenes normales; codificador congelado \\
+\bottomrule
+\end{tabularx}
+\nota{Elaborada a partir de los trabajos citados y de \cite{paez2026}.}
+\end{table}
+
+\subsection{Conjuntos de datos y anotación}
+
+Un conjunto de datos de inspección requiere un inventario de imágenes, metadatos de captura, una etiqueta por imagen y, para la localización, máscaras a nivel de píxel con criterios consistentes; se recomiendan un manual de anotación, la revisión cruzada de una muestra y una ficha de datos \cite{gebru2021}. Las capturas de una misma pieza o sesión deben quedar en un solo subconjunto, porque de lo contrario el modelo memoriza rasgos de la pieza y la evaluación sobrestima la generalización \cite{kapoor2023}. Los conjuntos de referencia públicos permiten verificar implementaciones, pero no sustituyen el conjunto real del caso de estudio.
+
+\subsection{Imágenes sintéticas y brecha de dominio}
+
+La síntesis de datos genera variantes de defectos de forma programática \cite{shorten2019,perlin1985} o con modelos generativos como las redes generativas adversarias y los modelos de difusión \cite{goodfellow2014,ho2020}. Conviene distinguir dos usos: la síntesis interna que forma parte de un método, como las pseudoanomalías de DRAEM, y las imágenes sintéticas externas que el proyecto genera y estudia como variable experimental.
+
+Se denomina brecha de dominio a la diferencia entre la distribución de los datos de entrenamiento y la de los datos de aplicación \cite{pan2010}. Una variación suficiente en datos simulados puede favorecer la transferencia a datos reales \cite{tobin2017}, pero no la garantiza. Por ello, la utilidad de los datos sintéticos solo puede medirse comparando entrenamientos con y sin síntesis sobre un mismo conjunto de prueba real.
+
+\subsection{Aprendizaje por transferencia}
+
+El aprendizaje por transferencia aprovecha representaciones obtenidas en otro dominio \cite{pan2010,yosinski2014}. En detección de anomalías, cada método fija su forma de transferencia: PatchCore usa un extractor congelado preentrenado en ImageNet \cite{roth2022}, Dinomaly mantiene congelado su codificador \cite{guo2025}, y DRAEM y EfficientAD optimizan sus redes \cite{zavrtanik2021,batzner2024}. Imponer un mismo esquema de ajuste fino alteraría de forma desigual sus formulaciones; por ello, en este estudio la transferencia se usa tal como la define cada método y no se manipula como factor experimental.
+
+\subsection{Métricas de evaluación}
+
+Las métricas se agrupan según la unidad de análisis y la decisión que apoyan:
+
+\begin{itemize}
+  \item \textbf{Por imagen.} El área bajo la curva característica operativa del receptor (ROC), o AUROC, y la precisión promedio (AP), denotadas I-AUROC e I-AP cuando se calculan por imagen, evalúan si la puntuación separa piezas defectuosas de normales; apoyan la decisión de aceptar o rechazar. Con clases desbalanceadas, la AP es más informativa que la curva ROC \cite{saito2015}.
+  \item \textbf{Por píxel.} El AUROC y la AP por píxel (P-AUROC y P-AP) y el área bajo la curva de solapamiento por región (AU-PRO), evalúan si el mapa coincide con la máscara de referencia; apoyan la verificación de la ubicación del defecto. El AU-PRO pondera por igual defectos grandes y pequeños \cite{bergmann2021,heckler2026}.
+  \item \textbf{Costo.} La latencia de inferencia y la memoria determinan si un modelo es viable en la plataforma.
+\end{itemize}
+
+Las métricas con umbral, como la puntuación F1, fijan ese umbral solo con datos de validación.
+
+\subsection{Antecedentes de investigación}
+
+Bergmann y colaboradores presentaron MVTec AD \cite{bergmann2019,bergmann2021}, que popularizó la evaluación sistemática de detección y segmentación de anomalías industriales. Sobre esa base surgieron los métodos de características de parches \cite{rippel2020,defard2021,roth2022}, los de destilación \cite{bergmann2020,deng2022,batzner2024}, los de anomalías sintéticas \cite{li2021,zavrtanik2021} y los basados en Transformers autosupervisados \cite{guo2025}. En paralelo, VisA \cite{zou2022} y MVTec AD 2 \cite{heckler2026} ampliaron los escenarios de evaluación (Tabla \ref{tab:antecedentes}).
+
+\begin{table}[H]
+\singlespacing\setlength{\parindent}{0pt}\setlength{\RaggedRightParindent}{0pt}
+\caption{Antecedentes de investigación y su relación con el proyecto}
+\label{tab:antecedentes}
+\begin{tabularx}{\textwidth}{@{}>{\RaggedRight\arraybackslash}p{3.7cm}>{\RaggedRight\arraybackslash}X>{\RaggedRight\arraybackslash}X@{}}
+\toprule
+Estudio & Contribución & Relación con el proyecto \\
+\midrule
+\multicolumn{3}{@{}l}{\textit{Métodos}} \\
+Defard et al. (2021) \cite{defard2021} & PaDiM: distribución gaussiana por posición de parche & Método de la misma familia de características de parches que PatchCore \\
+Li et al. (2021) \cite{li2021} & CutPaste: anomalías autogeneradas & Síntesis simple de defectos \\
+Zavrtanik et al. (2021) \cite{zavrtanik2021} & DRAEM y simulación de anomalías & Arquitectura comparada; vínculo con síntesis \\
+Roth et al. (2022) \cite{roth2022} & PatchCore y banco de parches normales & Arquitectura comparada \\
+Batzner et al. (2024) \cite{batzner2024} & EfficientAD y eficiencia de inferencia & Arquitectura comparada; latencia \\
+Guo et al. (2025) \cite{guo2025} & Dinomaly con codificador DINOv2 & Arquitectura comparada; representante Transformer \\
+\midrule
+\multicolumn{3}{@{}l}{\textit{Conjuntos de referencia públicos}} \\
+Bergmann et al. (2019) \cite{bergmann2019} & MVTec AD, con máscaras por píxel & Verificación de implementaciones \\
+Zou et al. (2022) \cite{zou2022} & VisA, con objetos complejos & Contexto de evaluación \\
+Heckler-Kram et al. (2026) \cite{heckler2026} & MVTec AD 2, con escenarios avanzados & Criterio de umbral y robustez \\
+\bottomrule
+\end{tabularx}
+\nota{El conjunto real de tapas es propio del proyecto y no forma parte de esta tabla. Elaborada a partir de los trabajos citados.}
+\end{table}
+
+\subsection{Análisis de antecedentes}
+
+Los antecedentes muestran dos tendencias complementarias: una mejora los algoritmos que reconocen desviaciones de la normalidad; otra fortalece la evaluación con escenarios más realistas \cite{liu2024}. Ninguno valida el comportamiento de los métodos sobre las tapas del caso de estudio ni cuantifica el aporte de anomalías sintéticas externas en ese dominio. Además, la mejora atribuida a una arquitectura solo es válida si los métodos se comparan con los mismos datos y la misma prueba real. Estas consideraciones se traducen en las hipótesis y controles del Capítulo 2.
+
+\subsection{Relación del marco teórico con la plataforma propuesta}
+
+La plataforma tiene dos flujos. El flujo experimental (Figura \ref{fig:plataforma}) organiza cuatro módulos: datos reales versionados, síntesis de anomalías externas, entrenamiento y evaluación de las arquitecturas, y análisis de métricas y costo. El flujo de uso (Figura \ref{fig:flujouso}) lleva una imagen de entrada al modelo seleccionado, ejecuta la inferencia y devuelve la puntuación, la decisión y el mapa de anomalía superpuesto a la imagen.
+
+\begin{figure}[H]
+\caption{Flujo experimental de la plataforma}
+\label{fig:plataforma}
+\singlespacing
+\centering
+\begin{tikzpicture}[font=\sffamily\small,
+  modulo/.style={draw, rounded corners=2pt, align=center, minimum width=3.6cm, minimum height=1.3cm, fill=gray!8},
+  flecha/.style={-latex, thick}]
+  \node[modulo] (datos) at (0,0) {Módulo I\\ Conjunto de datos real\\ \footnotesize imágenes, máscaras, metadatos};
+  \node[modulo] (sint) at (0,-3.2) {Módulo III\\ Síntesis externa\\ \footnotesize generación y validación};
+  \node[modulo] (entr) at (5.6,-1.6) {Módulo II\\ Entrenamiento y evaluación\\ \footnotesize PatchCore, EfficientAD-S,\\ \footnotesize DRAEM, Dinomaly};
+  \node[modulo] (anal) at (11.0,-1.6) {Módulo IV\\ Análisis\\ \footnotesize métricas, mapas, costo};
+  \draw[flecha] (datos.east) -- (entr.north west);
+  \draw[flecha, dashed] (sint.east) -- node[below right, font=\sffamily\footnotesize] {variantes} (entr.south west);
+  \draw[flecha] (entr) -- (anal);
+  \draw[flecha] (datos.south) -- node[left, font=\sffamily\footnotesize] {referencia} (sint.north);
+\end{tikzpicture}
+\par\RaggedRight
+\nota{El Módulo III produce las imágenes sintéticas externas, que son variable del estudio y solo entran al entrenamiento de variantes con nombre propio. La síntesis interna de DRAEM forma parte del método y no pasa por este módulo. La prueba final es exclusivamente real.}
+\end{figure}
+
+\begin{figure}[H]
+\caption{Flujo de uso de la plataforma de inspección}
+\label{fig:flujouso}
+\singlespacing
+\centering
+\begin{tikzpicture}[font=\sffamily\footnotesize,
+  paso/.style={draw, rounded corners=3pt, align=center, text width=1.95cm, minimum height=1.45cm, fill=gray!8},
+  flecha/.style={-latex, thick}]
+  \node[paso] (a) at (0,0)     {Imagen de\\ entrada};
+  \node[paso] (b) at (2.6,0)   {Modelo\\ seleccionado};
+  \node[paso] (c) at (5.2,0)   {Preproceso\\ e inferencia};
+  \node[paso] (d) at (7.8,0)   {Puntuación\\ y decisión};
+  \node[paso] (e) at (10.4,0)  {Mapa de\\ anomalía};
+  \node[paso] (f) at (13.0,0)  {Salida\\ visual};
+  \draw[flecha] (a) -- (b); \draw[flecha] (b) -- (c); \draw[flecha] (c) -- (d);
+  \draw[flecha] (d) -- (e); \draw[flecha] (e) -- (f);
+\end{tikzpicture}
+\par\RaggedRight
+\nota{La decisión usa el umbral fijado con datos de validación. La salida visual superpone el mapa de anomalía a la imagen e informa la puntuación y la decisión.}
+\end{figure}
+
+La correspondencia con el marco teórico es directa: la distinción entre detección y localización define las salidas de la plataforma; las familias de arquitecturas, los modelos integrados; las reglas de anotación y partición, la validez de las métricas; y la brecha de dominio, los experimentos con imágenes sintéticas. Las funciones accesibles al usuario y su verificación se definen en el Capítulo 2.
+
+% =====================================================================
+%  CAPÍTULO 2 — Metodología
+%  Revisado según las observaciones de la tutora (Avance 2) y alineado con
+%  la ficha registrada y el protocolo de arquitecturas v1.1.
+%  \pendiente{...} marca datos del proyecto que deben completarse con los
+%  valores reales; no se inventó ninguno. Compile dos veces.
+% =====================================================================
+\providecommand{\pendiente}[1]{\resaltarcaja{[#1]}}
+
+\capitulo{Metodología}
+
+Este capítulo describe el diseño del estudio y de la plataforma de inspección. Sigue el protocolo técnico de selección y evaluación de arquitecturas acordado con el cliente del proyecto \cite{paez2026}. Para distinguir lo ejecutado de lo previsto, el pasado se reserva para las decisiones ya tomadas y documentadas, y el futuro, para las actividades pendientes; la Tabla \ref{tab:estado} indica el estado de cada actividad y la evidencia que la respalda. Los subconjuntos de entrenamiento, validación y prueba se denotan TRAIN, VAL y TEST (sección \ref{sec:particion}).
+
+\section{Enfoque y diseño de la investigación}
+
+El proyecto se planteó como una investigación experimental, cuantitativa y comparativa, cuyo resultado es doble: evidencia empírica sobre el desempeño de arquitecturas de detección de anomalías y una plataforma funcional que integra los modelos seleccionados. Siguió la estructura de los estudios empíricos en visión por computador: datos documentados, protocolo fijo, experimentos repetibles y análisis estadístico \cite{pineau2021,bouthillier2021}. El trabajo se organizó en siete fases (Figura \ref{fig:fases}). Primero se obtienen líneas base con datos reales y solo después se introducen los datos sintéticos, como intervención separada \cite{paez2026}.
+
+\begin{figure}[H]
+\caption{Fases de la metodología}
+\label{fig:fases}
+\singlespacing
+\centering
+\begin{tikzpicture}[font=\sffamily\scriptsize,
+  fase/.style={draw, rounded corners=3pt, align=center, text width=1.75cm, minimum height=1.5cm, fill=gray!8},
+  flecha/.style={-latex, thick}]
+  \node[fase] (f1) at (0,0)     {\textbf{I}\\ Datos reales\\ v1.0};
+  \node[fase] (f2) at (2.25,0)  {\textbf{II}\\ Entorno y\\ preflight};
+  \node[fase] (f3) at (4.5,0)   {\textbf{III}\\ Verificación\\ en MVTec AD};
+  \node[fase] (f4) at (6.75,0)  {\textbf{IV}\\ Líneas base\\ nativas};
+  \node[fase, dashed] (f5) at (9.0,0) {\textbf{V}\\ Síntesis y\\ variantes};
+  \node[fase] (f6) at (11.25,0) {\textbf{VI}\\ Factores y\\ consolidación};
+  \node[fase] (f7) at (13.5,0)  {\textbf{VII}\\ Plataforma\\ funcional};
+  \draw[flecha] (f1) -- (f2); \draw[flecha] (f2) -- (f3); \draw[flecha] (f3) -- (f4);
+  \draw[flecha] (f4) -- (f5); \draw[flecha] (f5) -- (f6); \draw[flecha] (f6) -- (f7);
+  \draw[flecha] (f4.south) -- ++(0,-0.45) -| (f6.south);
+\end{tikzpicture}
+\par\RaggedRight
+\nota{La flecha inferior indica que los factores que no dependen de la síntesis pueden evaluarse aunque la fase V no concluya. Elaborada a partir de \cite{paez2026}.}
+\end{figure}
+
+\begin{table}[H]
+\singlespacing\setlength{\parindent}{0pt}\setlength{\RaggedRightParindent}{0pt}
+\caption{Estado de las actividades y evidencia que las respalda}
+\label{tab:estado}
+\begin{tabularx}{\textwidth}{@{}>{\RaggedRight\arraybackslash}X>{\RaggedRight\arraybackslash}p{3.2cm}>{\RaggedRight\arraybackslash}p{4.6cm}@{}}
+\toprule
+Actividad & Estado & Evidencia \\
+\midrule
+Selección y configuración de arquitecturas & Definida & Protocolo v1.1 \cite{paez2026} \\
+Equipo y entorno de partida & Definidos & Protocolo v1.1 \cite{paez2026} \\
+Consolidación de anotaciones y conjunto v1.0 & \pendiente{estado} & \pendiente{manifiesto y \textit{hash}} \\
+Prueba de humo y preflight (E0) & \pendiente{estado} & \pendiente{registros de corrida} \\
+Síntesis externa (E3) & Prevista & Coordinación técnica pendiente \\
+Experimentos E1, E2 y E4 a E7 & Previstos & -- \\
+Plataforma funcional & Prevista & -- \\
+\bottomrule
+\end{tabularx}
+\nota{Se actualiza en cada avance.}
+\end{table}
+
+\subsection{Hipótesis}
+
+Se formularon tres hipótesis refutables, con su métrica y su criterio de decisión fijados antes de los experimentos:
+
+\begin{itemize}
+  \item \textbf{H1.} El ordenamiento de las cuatro arquitecturas obtenido en MVTec AD no se conserva en las tapas. Se comparan los ordenamientos según I-AUROC (imagen) y AU-PRO (píxel) con el coeficiente $\tau$ de Kendall \cite{kendall1938}. H1 se apoya si $\tau < 1$ y al menos un par invierte su orden con una diferencia en las tapas cuyo intervalo de confianza del 95\,\% excluye el cero.
+  \item \textbf{H2.} Entrenar DRAEM con las anomalías sintéticas externas mejora la localización frente a su síntesis interna de referencia. La métrica primaria es el AU-PRO en TEST. Se usa un contraste pareado entre DRAEM-Proyecto y DRAEM-Ref, con las mismas semillas, el mismo presupuesto y el mismo TEST. H2 se apoya si el intervalo de confianza del 95\,\% de $\Delta_{\mathrm{sint}}$ (sección \ref{sec:sintesis}) es positivo.
+  \item \textbf{H3.} La reducción de imágenes normales de entrenamiento afecta de forma distinta a cada arquitectura. Se estima, con I-AUROC, un análisis de varianza de dos factores (arquitectura y fracción de normales) sobre los valores por semilla \cite{montgomery2017}. H3 se apoya si el término de interacción es significativo ($p < 0{,}05$).
+\end{itemize}
+
+\subsection{Variables y principio de comparación}
+
+La estrategia de identificación consistió en modificar un único factor por experimento, con replicación por semillas y un conjunto de prueba único \cite{montgomery2017}. Una comparación justa no impuso el mismo entrenamiento a todos los modelos: mantuvo constantes las variables comunes y documentó las excepciones de cada arquitectura \cite{paez2026} (Tabla \ref{tab:variables}).
+
+\begin{table}[H]
+\singlespacing\setlength{\parindent}{0pt}\setlength{\RaggedRightParindent}{0pt}
+\caption{Variables del estudio y principio de comparación}
+\label{tab:variables}
+\begin{tabularx}{\textwidth}{@{}>{\RaggedRight\arraybackslash}p{3.6cm}>{\RaggedRight\arraybackslash}X@{}}
+\toprule
+Tipo & Variables \\
+\midrule
+Independientes & Arquitectura; fuente de anomalías en DRAEM; fracción de normales de entrenamiento; aumento de datos convencional; condición de captura. \\
+Dependientes & Métricas por imagen y por píxel, costo computacional (sección \ref{sec:metricas}). \\
+Comunes (constantes) & Versión del conjunto y particiones; TEST real; equipo; código de evaluación; umbral fijado en VAL; procedimiento de latencia y memoria; semillas finales. \\
+Pueden diferir (documentadas) & Resolución nativa; extractor o variante del método; iteraciones; tamaño de lote; pseudoanomalías nativas. \\
+\bottomrule
+\end{tabularx}
+\nota{Elaborada a partir de \cite{paez2026}.}
+\end{table}
+
+\section{Formulación y selección de la alternativa de solución}
+
+Las alternativas se evaluaron con tres criterios eliminatorios y uno comparativo. Los eliminatorios fueron: no requerir muchos defectos anotados (C1), dada su escasez; localizar el defecto por píxel (C2), porque la plataforma debe mostrarlo; y ejecutarse en el equipo de 11 GB (C3). El comparativo fue la robustez ante variaciones de captura y el riesgo de dominio (C4) (Tabla \ref{tab:alternativas}).
+
+\begin{table}[H]
+\singlespacing\setlength{\parindent}{0pt}\setlength{\RaggedRightParindent}{0pt}
+\caption{Evaluación de las alternativas de solución}
+\label{tab:alternativas}
+\begin{tabularx}{\textwidth}{@{}>{\RaggedRight\arraybackslash}p{3.4cm}>{\RaggedRight\arraybackslash}p{2.1cm}>{\RaggedRight\arraybackslash}p{1.6cm}>{\RaggedRight\arraybackslash}p{1.6cm}>{\RaggedRight\arraybackslash}X@{}}
+\toprule
+Alternativa & C1 Anotación & C2 Localiza & C3 Equipo & Resultado (C4) \\
+\midrule
+A1. Visión por reglas \cite{czimmermann2020} & Cumple & Parcial & Cumple & Descartada: frágil ante variaciones de captura \\
+A2. Supervisada \cite{redmon2016} & No cumple & Cumple & Cumple & Descartada en C1 \\
+A3. Anomalías con piezas normales \cite{roth2022,zavrtanik2021,batzner2024,guo2025} & Cumple & Cumple & Cumple & Seleccionada \\
+A4. Visión-lenguaje \cite{jeong2023,zhou2024} & Cumple & Cumple & No verificado & Fuera del alcance: transferencia no verificada en el dominio \\
+\bottomrule
+\end{tabularx}
+\nota{Elaborada a partir de los trabajos citados.}
+\end{table}
+
+Dentro de A3 se seleccionaron y congelaron cuatro arquitecturas con cinco criterios \cite{paez2026}: complementariedad científica, reproducibilidad en Anomalib \cite{akcay2022}, viabilidad computacional, relación con la pregunta y riesgo de implementación acotado. No se buscó elegir los cuatro mejores modelos, sino cubrir paradigmas complementarios; su papel se resume en la Tabla \ref{tab:roles}.
+
+La selección experimental informa a la plataforma: esta integrará las arquitecturas que superen el preflight y la evaluación, y propondrá por defecto la de mejor compromiso entre métricas primarias, robustez y latencia; las demás quedarán disponibles para comparación.
+
+\section{Conjuntos de datos}
+
+\subsection{Conjunto de referencia}
+
+MVTec AD \cite{bergmann2019,bergmann2021} sirve para el preflight y para reproducir una referencia publicada con configuración comparable. La reproducción se acepta si queda a no más de dos puntos porcentuales del valor publicado para una configuración equivalente; si Dinomaly usa su variante pequeña, se contrasta con una referencia de esa variante \cite{paez2026,guo2025supp}.
+
+\subsection{Conjunto real de tapas}
+
+Las imágenes provienen del proyecto previo con la empresa colaboradora: cámara y óptica \pendiente{modelo}, iluminación \pendiente{tipo}, resolución \pendiente{píxeles}, \pendiente{N} sesiones y \pendiente{N} piezas. La consolidación de las anotaciones previas, realizada en la herramienta CVAT (\textit{Computer Vision Annotation Tool}) \cite{cvatweb}, se documenta en la Tabla \ref{tab:consolidacion}; cada imagen defectuosa tiene una máscara obligatoria a nivel de píxel con su categoría.
+
+\begin{table}[H]
+\singlespacing\setlength{\parindent}{0pt}\setlength{\RaggedRightParindent}{0pt}
+\caption{Consolidación de anotaciones y conteo por categoría}
+\label{tab:consolidacion}
+\begin{tabularx}{\textwidth}{@{}>{\RaggedRight\arraybackslash}X>{\centering\arraybackslash}p{3cm}@{}}
+\toprule
+Concepto & Imágenes \\
+\midrule
+Anotaciones previas recibidas & \pendiente{N} \\
+Conservadas sin cambios / corregidas / descartadas & \pendiente{N / N / N} \\
+Normales & \pendiente{N} \\
+Defectuosas, por categoría: \pendiente{categoría 1}, \pendiente{categoría 2}, \ldots & \pendiente{N por categoría} \\
+\bottomrule
+\end{tabularx}
+\nota{Las correcciones y su motivo constan en el registro de versiones del conjunto.}
+\end{table}
+
+Una muestra de \pendiente{n} imágenes, seleccionada por muestreo aleatorio estratificado por categoría y por pieza, se anotará de forma independiente por dos personas. El acuerdo en las etiquetas se medirá con el coeficiente kappa de Cohen \cite{cohen1960}:
+\begin{equation}
+  \kappa = \frac{p_o - p_e}{1 - p_e}
+\end{equation}
+donde $p_o$ es el acuerdo observado y $p_e$ el esperado por azar. En las máscaras se medirá la intersección sobre la unión (IoU) \cite{everingham2010}:
+\begin{equation}
+  \mathrm{IoU}(A,B) = \frac{|A \cap B|}{|A \cup B|}
+\end{equation}
+donde $A$ y $B$ son las máscaras de ambos anotadores. Resultados: $\kappa =$ \pendiente{valor} e IoU media $=$ \pendiente{valor}. Las discrepancias se resolverán por consenso y, si persisten, con un tercer revisor. El conjunto final se congelará como versión 1.0, identificada por \pendiente{\textit{hash}}, con su ficha de datos \cite{gebru2021}.
+
+\subsection{Partición sin filtración de información}
+\label{sec:particion}
+
+Los subconjuntos TRAIN, VAL y TEST se forman por grupos. Como pieza, lote y sesión pueden cruzarse, cada imagen se trata como un nodo y se enlazan las imágenes que comparten cualquiera de esos identificadores; cada componente conexo resultante es un grupo indivisible que se asigna completo a un único subconjunto. Así ningún identificador aparece en más de uno \cite{kapoor2023}. La asignación se registra en un manifiesto de grupos versionado.
+
+TRAIN contiene solo normales reales; VAL, normales y defectuosas reales para fijar umbrales; TEST queda bloqueado, es exclusivamente real y no se usa para seleccionar hiperparámetros, umbrales, \textit{prompts}, generadores ni puntos de control \cite{paez2026}. TEST debe incluir al menos \pendiente{n} imágenes defectuosas por categoría (Figura \ref{fig:particion}, Tabla \ref{tab:particion}).
+
+\begin{figure}[H]
+\caption{Partición por grupos y uso de imágenes sintéticas}
+\label{fig:particion}
+\singlespacing
+\centering
+\begin{tikzpicture}[font=\sffamily\footnotesize,
+  caja/.style={draw, rounded corners=3pt, align=center, text width=3.1cm, minimum height=1.2cm, fill=gray!8},
+  flecha/.style={-latex, thick}]
+  \node[caja, text width=3.4cm] (piezas) at (0,0) {Grupos conexos de\\ pieza, lote y sesión};
+  \node[caja] (tr) at (5.2,1.6)  {\textbf{TRAIN}\\ normales reales};
+  \node[caja] (va) at (5.2,0)    {\textbf{VAL}\\ normales y defectuosas};
+  \node[caja] (te) at (5.2,-1.6) {\textbf{TEST} (bloqueado)\\ solo imágenes reales};
+  \node[caja, dashed] (sin) at (10.6,0.8) {Anomalías sintéticas\\ externas};
+  \draw[flecha] (piezas.east) -- (tr.west);
+  \draw[flecha] (piezas.east) -- (va.west);
+  \draw[flecha] (piezas.east) -- (te.west);
+  \draw[flecha, dashed] (va.east) -- node[below right] {referencia} (sin.south west);
+  \draw[flecha, dashed] (sin.north west) -- node[above right] {variantes} (tr.east);
+\end{tikzpicture}
+\par\RaggedRight
+\nota{Cada grupo pertenece a un solo subconjunto. Las imágenes sintéticas se generan sin usar TEST y solo entran al entrenamiento de variantes con nombre propio.}
+\end{figure}
+
+\begin{table}[H]
+\singlespacing\setlength{\parindent}{0pt}\setlength{\RaggedRightParindent}{0pt}
+\caption{Composición de la partición del conjunto real}
+\label{tab:particion}
+\begin{tabularx}{\textwidth}{@{}>{\RaggedRight\arraybackslash}X>{\centering\arraybackslash}p{2.6cm}>{\centering\arraybackslash}p{2.6cm}>{\centering\arraybackslash}p{2.6cm}@{}}
+\toprule
+Subconjunto & Normales & Defectuosas & Grupos \\
+\midrule
+TRAIN & \pendiente{N} & 0 & \pendiente{N} \\
+VAL & \pendiente{N} & \pendiente{N} & \pendiente{N} \\
+TEST & \pendiente{N} & \pendiente{N} & \pendiente{N} \\
+\bottomrule
+\end{tabularx}
+\nota{Conteos verificados contra el manifiesto de grupos de la versión 1.0.}
+\end{table}
+
+\section{Configuración de las arquitecturas}
+
+Las implementaciones provienen de Anomalib \cite{akcay2022}, sobre PyTorch \cite{paszke2019}. Cada arquitectura usa su resolución nativa, porque forzar una resolución única podría perjudicar selectivamente a un método; una resolución común queda solo como ablación secundaria \cite{paez2026}. La configuración inicial se detalla en el Apéndice A. Dinomaly parte de un codificador ViT-Base con lote 1 en precisión de punto flotante de 16 bits (FP16); su protocolo original usa una GPU de 24 GB \cite{guo2025supp}, por lo que su variante final se fijará tras el preflight: \pendiente{ViT-Base o ViT-Small}.
+
+Si el equipo impide ejecutar una configuración, se aplican, en orden, estas exclusiones: reducir el \textit{coreset} de PatchCore; pasar Dinomaly a ViT-Small y, si tampoco cabe, excluirlo y reportarlo; y omitir primero DRAEM-Mixto y E7. Toda modificación se nombra como variante y nunca se presenta como la línea base original \cite{paez2026}.
+
+\section{Generación y validación de imágenes sintéticas}
+\label{sec:sintesis}
+
+La síntesis externa puede ser procedimental \cite{li2021,schluter2022} o generativa, con redes adversarias \cite{duan2023,goodfellow2014} o modelos de difusión \cite{hu2024,ho2020}. Se fijará el generador, \pendiente{generador}, con sus parámetros, \pendiente{parámetros}, y una cantidad de \pendiente{N} imágenes por categoría de defecto. Tomará como base imágenes normales de TRAIN y como referencia de apariencia defectuosas reales de VAL; nunca usará TEST.
+
+Cada imagen sintética se aceptará si cumple cuatro criterios: su máscara binaria cubre la región modificada; no presenta artefactos visibles fuera de la máscara, según revisión experta; su categoría corresponde a la taxonomía; y conserva la trazabilidad de origen, método, parámetros y semilla. La calidad del conjunto aceptado (E3) se medirá con FID (\textit{Fréchet Inception Distance}) \cite{heusel2017}, KID (\textit{Kernel Inception Distance}), insesgado en muestras pequeñas \cite{binkowski2018}, y LPIPS (\textit{Learned Perceptual Image Patch Similarity}) para la diversidad \cite{zhang2018,duan2023,hu2024}, junto con la cobertura de categorías.
+
+PatchCore, EfficientAD-S y Dinomaly conservan líneas base solo con normales reales; en PatchCore, las anomalías no se incorporan al banco de memoria, porque contaminarían la referencia de normalidad \cite{paez2026}. En DRAEM se compararán DRAEM-Ref, con su síntesis interna; DRAEM-Proyecto, con las anomalías externas; y, opcionalmente, DRAEM-Mixto. Las variantes usarán el mismo número de ejemplos sintéticos, las mismas normales reales, el mismo presupuesto de entrenamiento y las mismas semillas, para atribuir las diferencias a la fuente sintética. El efecto se expresa como:
+\begin{equation}
+  \Delta_{\mathrm{sint}} = Q(\text{DRAEM-Proyecto}) - Q(\text{DRAEM-Ref})
+\end{equation}
+donde $Q$ es la métrica primaria de localización. Un $\Delta_{\mathrm{sint}}$ negativo se reportará como hallazgo válido. El aumento de datos convencional \cite{shorten2019} se trata como un factor distinto.
+
+\section{Diseño experimental}
+
+No se ejecutará el producto cartesiano de los factores. Primero se realizarán E0 y E1, y después los demás bloques según su prioridad. La Tabla \ref{tab:experimentos} indica los datos de cada bloque; TEST solo interviene en la evaluación final.
+
+\begin{table}[H]
+\singlespacing\setlength{\parindent}{0pt}\setlength{\RaggedRightParindent}{0pt}
+\caption{Matriz experimental priorizada y datos de cada bloque}
+\label{tab:experimentos}
+\begin{tabularx}{\textwidth}{@{}>{\RaggedRight\arraybackslash}p{3.2cm}>{\RaggedRight\arraybackslash}X>{\RaggedRight\arraybackslash}p{5.2cm}@{}}
+\toprule
+Bloque & Propósito y prioridad & Datos \\
+\midrule
+E0 Prueba de humo & Instalación y factibilidad; obligatoria & Categoría pequeña de MVTec AD \\
+E1 Líneas base & Protocolo nativo; contrasta H1; obligatoria & TRAIN y VAL; TEST final \\
+E2 Escasez de normales & 10, 25, 50 y 100\,\%; contrasta H3; alta & Subconjuntos de TRAIN; TEST final \\
+E3 Calidad de sintéticos & Criterios de la sección \ref{sec:sintesis}; obligatoria & Sintéticos frente a defectuosas de VAL \\
+E4 Aporte de sintéticos & Variantes de DRAEM; contrasta H2; obligatoria & TRAIN y sintéticos; TEST final \\
+E5 Aumento de datos & Activado o desactivado; alta & TRAIN; TEST final \\
+E6 Eficiencia & Latencia y memoria; obligatoria & Imágenes de VAL \\
+E7 Robustez & Iluminación, cámara o lote; media/alta & TEST estratificado o perturbado \\
+\bottomrule
+\end{tabularx}
+\nota{Elaborada a partir de \cite{paez2026}.}
+\end{table}
+
+Se usará una semilla en exploración y tres en las configuraciones finales, porque la variación entre semillas puede igualar a las diferencias entre métodos \cite{bouthillier2021,paez2026}. Los umbrales se fijarán solo con VAL; si VAL no tiene defectos suficientes, se aplicará el criterio de MVTec AD 2: media de los valores de anomalía por píxel de las normales de validación más tres desviaciones estándar \cite{heckler2026}. La validez interna se protege con la partición por grupos y el bloqueo de TEST; la externa queda limitada a un tipo de pieza y de línea.
+
+\section{Métricas y análisis estadístico}
+\label{sec:metricas}
+
+Las métricas primarias son el I-AUROC, para la detección por imagen, y el AU-PRO, para la localización por píxel. Las secundarias son la AP por imagen (I-AP), el AUROC y la AP por píxel (P-AUROC y P-AP), y F1, precisión y exhaustividad con umbral de VAL. El costo se mide con la latencia en los percentiles 50 y 95 (p50 y p95), con lote 1, las imágenes por segundo y el pico de memoria de GPU \cite{paez2026}. El AUROC estima la probabilidad de que una imagen defectuosa puntúe más alto que una normal, con medio crédito para los empates \cite{fawcett2006}:
+\begin{equation}
+  \mathrm{AUROC} = \frac{1}{n^{+} n^{-}} \sum_{i=1}^{n^{+}} \sum_{j=1}^{n^{-}} \left( \mathbf{1}\!\left[s(x_i^{+}) > s(x_j^{-})\right] + \tfrac{1}{2}\,\mathbf{1}\!\left[s(x_i^{+}) = s(x_j^{-})\right] \right)
+\end{equation}
+donde $n^{+}$ y $n^{-}$ son las imágenes defectuosas y normales. La precisión promedio es \cite{saito2015}:
+\begin{equation}
+  \mathrm{AP} = \sum_{n} \left(R_n - R_{n-1}\right) P_n
+\end{equation}
+con $P_n$ y $R_n$ la precisión y la exhaustividad en el $n$-ésimo umbral. El solapamiento por región pondera por igual cada defecto \cite{bergmann2020,bergmann2021}:
+\begin{equation}
+  \mathrm{PRO}(t) = \frac{1}{K} \sum_{k=1}^{K} \frac{|P_t \cap C_k|}{|C_k|}
+\end{equation}
+donde $C_k$ es la $k$-ésima región defectuosa y $P_t$ los píxeles anómalos con umbral $t$. El AU-PRO es el área normalizada bajo esta curva hasta una tasa de falsos positivos (FPR) de 0,30, como en MVTec AD \cite{bergmann2021}; también se informa con 0,05 \cite{heckler2026}. Además, $F_1 = 2PR/(P+R)$. La latencia se mide en PyTorch nativo, sin la carga de datos y tras un calentamiento \cite{paez2026}.
+
+Cada métrica final se reportará como media y desviación estándar entre semillas. Como una pieza aporta varias imágenes, estas no son independientes; por ello no se usa la prueba de DeLong, que supone observaciones independientes, sino un \textit{bootstrap} pareado por pieza \cite{efron1979,field2007}. En cada réplica se remuestrean piezas con reemplazo, se recalculan las métricas de ambos modelos sobre las mismas imágenes y se obtiene su diferencia; el intervalo del 95\,\% se toma de los percentiles de esas diferencias. No se declarará un ganador con una sola métrica \cite{paez2026}.
+
+\section{Diseño funcional de la plataforma de inspección}
+
+La plataforma implementa el flujo de uso de la Figura \ref{fig:flujouso}. Cada modelo integrado se empaqueta con su punto de control final, su configuración y el umbral fijado en VAL, y se ejecuta en PyTorch nativo, igual que en la medición de latencia. La interfaz se construirá con \pendiente{tecnología de interfaz}. Las funciones accesibles al usuario son: (F1) cargar una imagen; (F2) seleccionar el modelo, con el recomendado por defecto; (F3) ejecutar la inferencia; (F4) ver la puntuación y la decisión; y (F5) ver el mapa de anomalía superpuesto a la imagen. La Tabla \ref{tab:pruebas} define las pruebas del flujo completo, que se ejecutarán con imágenes de VAL.
+
+\begin{table}[H]
+\singlespacing\setlength{\parindent}{0pt}\setlength{\RaggedRightParindent}{0pt}
+\caption{Pruebas del flujo completo de la plataforma}
+\label{tab:pruebas}
+\begin{tabularx}{\textwidth}{@{}>{\RaggedRight\arraybackslash}p{3.3cm}>{\RaggedRight\arraybackslash}X@{}}
+\toprule
+Prueba & Criterio verificable de aprobación \\
+\midrule
+P1 Carga (F1) & Una imagen válida se muestra; un archivo no válido produce un mensaje de error y no ejecuta la inferencia. \\
+P2 Inferencia (F2, F3) & La puntuación coincide, con tolerancia \pendiente{valor}, con la del código de evaluación para la misma imagen, modelo y configuración. \\
+P3 Decisión (F4) & La decisión es igual a aplicar el umbral de VAL a la puntuación. \\
+P4 Mapa (F5) & El mapa tiene la resolución de la imagen de entrada y su superposición está alineada. \\
+P5 Tiempo & El percentil 95 del tiempo total por imagen, de carga a visualización, es menor o igual a \pendiente{t} s en el equipo de referencia, sobre \pendiente{n} imágenes. \\
+\bottomrule
+\end{tabularx}
+\nota{Los registros de ejecución de cada prueba se adjuntarán como evidencia.}
+\end{table}
+
+\section{Especificaciones del entorno experimental}
+
+El equipo de referencia es una NVIDIA GeForce RTX 2080 Ti de 11 GB con un Intel Core i9-10850K y 16 GB de memoria de acceso aleatorio (RAM) \cite{paez2026}. El entorno parte de PyTorch 2.6.0 y Anomalib 2.6.2 y se congelará tras la prueba de humo con contenedor Docker \cite{merkel2014}: versiones finales \pendiente{versiones} y registros de la prueba de humo \pendiente{registros}. Las reglas de ejecución, el registro del preflight y los criterios de aceptación de la etapa de arquitecturas se detallan en el Apéndice A. Cada resultado registrará configuración, semilla y versiones \cite{pineau2021}, y los modelos finales se documentarán con fichas de modelo \cite{mitchell2019}.
+
+\section{Consideraciones éticas y legales}
+
+La autorización de la empresa colaboradora, cuyo nombre se omite, se documenta con \pendiente{documento de autorización} y define el alcance de uso de sus imágenes (Tabla \ref{tab:autorizacion}). La captura excluyó personas, por lo que el conjunto no contiene datos personales en el sentido de la Ley Orgánica de Protección de Datos Personales \cite{lopdp2021}.
+
+\begin{table}[H]
+\singlespacing\setlength{\parindent}{0pt}\setlength{\RaggedRightParindent}{0pt}
+\caption{Alcance de la autorización de uso de las imágenes del caso de estudio}
+\label{tab:autorizacion}
+\begin{tabularx}{\textwidth}{@{}>{\RaggedRight\arraybackslash}X>{\RaggedRight\arraybackslash}p{2.4cm}>{\RaggedRight\arraybackslash}p{4.6cm}@{}}
+\toprule
+Uso & Autorizado & Condiciones \\
+\midrule
+Entrenamiento de modelos & \pendiente{sí/no} & \pendiente{condiciones} \\
+Evaluación de modelos & \pendiente{sí/no} & \pendiente{condiciones} \\
+Ejemplos de imágenes en el informe & \pendiente{sí/no} & \pendiente{condiciones} \\
+Difusión en presentaciones, artículos o repositorios & \pendiente{sí/no} & \pendiente{condiciones} \\
+\bottomrule
+\end{tabularx}
+\nota{Completar según el documento de autorización.}
+\end{table}
+
+Estas condiciones son distintas de las licencias de los recursos de referencia. MVTec AD se distribuye bajo CC BY-NC-SA 4.0, que prohíbe el uso comercial \cite{mvtecadweb}, por lo que solo se usa para verificar implementaciones; Anomalib se distribuye bajo Apache 2.0 \cite{anomalibweb} y CVAT bajo MIT \cite{cvatweb}. Se reportarán todos los resultados, incluidos los negativos, y ninguna decisión se ajustará con TEST \cite{pineau2021,kapoor2023}.
+
+% ============================ CAPÍTULO 3 =============================
+\capitulo{Resultados y análisis}
+
+\resaltar{(Máximo 3000 palabras para el capítulo 3)}
+
+Recuerde que tanto los gráficos como las tablas completan el texto y ayudan a una comprensión rápida y exacta de los resultados. Su función es clarificar la información y poner énfasis en los datos más significativos, para establecer relaciones y resumir el material de los hallazgos.
+
+Sobre la publicación de los datos, \resaltar{se debe de tener cuidado al publicarlos en el documento ya que estos pueden ser personales, sensibles}, en estos casos, se recomienda que sean datos agregados, es decir, un conjunto de información recopilada con base a promedios o resumen de un grupo de datos individuales, también se recomienda utilizar técnicas para anonimizar datos con el fin de que se salvaguarde datos de identidad o información sensible.
+
+\begin{destacado}
+En el caso que sea un proyecto inter/multidisciplinario deberá presentar los datos más representativos a nivel global del proyecto y a nivel específico (los resultados relacionados al aporte de su carrera).
+\end{destacado}
+
+% ============================ CAPÍTULO 4 =============================
+\capitulo{Conclusiones y recomendaciones}
+
+En esta sección describirá la importancia del trabajo desarrollado, las fortalezas y las debilidades. Debe explicar lo que los resultados significan, la importancia respecto a otros trabajos realizados. Las implicaciones de este trabajo y los posibles trabajos futuros. \resaltar{(Máximo 800 palabras para el capítulo 4)}
+
+\section{Conclusiones}
+
+Las conclusiones siempre tienen que estar respaldadas por los resultados obtenidos en el trabajo y deben referirse a los objetivos planteados al inicio del proyecto.
+
+La redacción debe ser puntual y cada conclusión debe estar separada por un ítem para lograr que su lector conecte cada una de ellas con sus objetivos.
+
+Para escribir estos apartados se recomienda lo siguiente:
+
+Arme un párrafo inicial muy breve que indique que tras aplicar las fases necesarias de la propuesta se obtienen las siguientes conclusiones primordiales:
+\begin{itemize}[leftmargin=2cm]
+  \item Arme un ítem para cada conclusión obtenida.
+  \item Solo redacte una conclusión por cada objetivo de su proyecto. Recuerde que previamente usted ya detalló resultados por cada fase de su proyecto, así es que aquí debe ser conciso y puntual.
+  \item Procure que no existan generalizaciones.
+  \item Procure trabajar con párrafos cortos.
+\end{itemize}
+
+\begin{destacado}
+En el caso que sea un proyecto inter/multidisciplinario, las conclusiones siempre tienen que estar respaldadas por los resultados obtenidos en el trabajo a nivel global y de manera específica (las conclusiones relacionadas a su disciplina), y tienen que referirse tanto a los objetivos generales como a los específicos planteados al inicio del proyecto.
+\end{destacado}
+
+\section{Recomendaciones}
+
+En esta sección se escriben las recomendaciones o trabajos que se recomiendan realizar en el futuro. Puede incluir aspectos que no fueron abordados por usted debido a elementos de factibilidad, pero que sabe que siguen presentes en su fenómeno de estudio y otros investigadores deberían abordarlos.
+
+Arme un párrafo base y breve que indique que tras culminar lo planificado en la propuesta se obtienen las siguientes recomendaciones primordiales.
+\begin{itemize}[leftmargin=2cm]
+  \item Luego arme un ítem para cada recomendación pertinente.
+  \item En las recomendaciones coloque cómo este trabajo puede ser ampliado (estudios futuros posibles)
+  \item Reconozca las limitaciones de su estudio y cómo considera que pueden o deben abordarse en otra fase de estudio.
+\end{itemize}
+
+\bigskip
+{\color{red}\bfseries
+En caso de que su proyecto integrador requiera de un capítulo extra que este formato no contempla, usted lo puede integrar. Por favor, revise que ese capítulo no repita información que ya abarca el presente formato. Por ejemplo, no arme dos capítulos de Resultados u otro extra de revisión de literatura, pues esa información ya se abarca aquí y usted debe ordenar su proyecto no solo para su entendimiento, sino para que lectores externos lo revisen.
+
+El capítulo extra que integre debe ir antes del de Conclusiones y Recomendaciones.\par}
+
+% =====================================================================
+%  REFERENCIAS (sin numeración de página)
+% =====================================================================
+\clearpage
+\pagestyle{empty}
+\encabezado{Referencias}
+
+% Norma IEEE, numeradas por orden de primera aparición en el texto.
+\begingroup
+\makeatletter
+\renewenvironment{thebibliography}[1]{%
+  \list{\@biblabel{\@arabic\c@enumiv}}{%
+    \settowidth\labelwidth{\@biblabel{#1}}%
+    \leftmargin\labelwidth\advance\leftmargin\labelsep
+    \itemsep=0.5\baselineskip\parsep=0pt
+    \usecounter{enumiv}\let\p@enumiv\@empty
+    \renewcommand\theenumiv{\@arabic\c@enumiv}}%
+  \singlespacing\RaggedRight}{\endlist}
+\makeatother
+\begin{thebibliography}{99}
+\bibitem{czimmermann2020} T. Czimmermann \textit{et al.}, ``Visual-based defect detection and classification approaches for industrial applications---A survey,'' \textit{Sensors}, vol. 20, no. 5, art. 1459, 2020, doi: 10.3390/s20051459.
+
+\bibitem{chandola2009} V. Chandola, A. Banerjee y V. Kumar, ``Anomaly detection: A survey,'' \textit{ACM Comput. Surv.}, vol. 41, no. 3, art. 15, 2009, doi: 10.1145/1541880.1541882.
+
+\bibitem{ruff2021} L. Ruff \textit{et al.}, ``A unifying review of deep and shallow anomaly detection,'' \textit{Proc. IEEE}, vol. 109, no. 5, pp. 756--795, 2021, doi: 10.1109/JPROC.2021.3052449.
+
+\bibitem{pang2021} G. Pang, C. Shen, L. Cao y A. van den Hengel, ``Deep learning for anomaly detection: A review,'' \textit{ACM Comput. Surv.}, vol. 54, no. 2, art. 38, 2021, doi: 10.1145/3439950.
+
+\bibitem{bergmann2019} P. Bergmann, M. Fauser, D. Sattlegger y C. Steger, ``MVTec AD---A comprehensive real-world dataset for unsupervised anomaly detection,'' en \textit{Proc. IEEE/CVF Conf. Comput. Vis. Pattern Recognit. (CVPR)}, Long Beach, CA, EE.\,UU., 2019, pp. 9592--9600.
+
+\bibitem{bergmann2021} P. Bergmann, K. Batzner, M. Fauser, D. Sattlegger y C. Steger, ``The MVTec anomaly detection dataset: A comprehensive real-world dataset for unsupervised anomaly detection,'' \textit{Int. J. Comput. Vis.}, vol. 129, no. 4, pp. 1038--1059, 2021, doi: 10.1007/s11263-020-01400-4.
+
+\bibitem{zou2022} Y. Zou, J. Jeong, L. Pemula, D. Zhang y O. Dabeer, ``SPot-the-difference self-supervised pre-training for anomaly detection and segmentation,'' en \textit{Computer Vision -- ECCV 2022}, LNCS, vol. 13690. Cham, Suiza: Springer, 2022, pp. 392--408, doi: 10.1007/978-3-031-20056-4\_23.
+
+\bibitem{liu2024} J. Liu \textit{et al.}, ``Deep industrial image anomaly detection: A survey,'' \textit{Mach. Intell. Res.}, vol. 21, no. 1, pp. 104--135, 2024, doi: 10.1007/s11633-023-1459-z.
+
+\bibitem{heckler2026} L. Heckler-Kram, J.-H. Neudeck, U. Scheler, R. König y C. Steger, ``The MVTec AD 2 dataset: Advanced scenarios for unsupervised anomaly detection,'' \textit{Int. J. Comput. Vis.}, vol. 134, no. 4, 2026, doi: 10.1007/s11263-026-02743-0.
+
+\bibitem{tobin2017} J. Tobin, R. Fong, A. Ray, J. Schneider, W. Zaremba y P. Abbeel, ``Domain randomization for transferring deep neural networks from simulation to the real world,'' en \textit{Proc. IEEE/RSJ Int. Conf. Intell. Robots Syst. (IROS)}, Vancouver, Canadá, 2017, pp. 23--30.
+
+\bibitem{roth2022} K. Roth, L. Pemula, J. Zepeda, B. Schölkopf, T. Brox y P. Gehler, ``Towards total recall in industrial anomaly detection,'' en \textit{Proc. IEEE/CVF Conf. Comput. Vis. Pattern Recognit. (CVPR)}, Nueva Orleans, LA, EE.\,UU., 2022, pp. 14318--14328.
+
+\bibitem{zavrtanik2021} V. Zavrtanik, M. Kristan y D. Skočaj, ``DRAEM---A discriminatively trained reconstruction embedding for surface anomaly detection,'' en \textit{Proc. IEEE/CVF Int. Conf. Comput. Vis. (ICCV)}, 2021, pp. 8330--8339.
+
+\bibitem{batzner2024} K. Batzner, L. Heckler y R. König, ``EfficientAD: Accurate visual anomaly detection at millisecond-level latencies,'' en \textit{Proc. IEEE/CVF Winter Conf. Appl. Comput. Vis. (WACV)}, Waikoloa, HI, EE.\,UU., 2024, pp. 128--138.
+
+\bibitem{guo2025} J. Guo, S. Lu, W. Zhang, F. Chen, H. Li y H. Liao, ``Dinomaly: The less is more philosophy in multi-class unsupervised anomaly detection,'' en \textit{Proc. IEEE/CVF Conf. Comput. Vis. Pattern Recognit. (CVPR)}, Nashville, TN, EE.\,UU., 2025, pp. 20405--20415.
+
+\bibitem{kapoor2023} S. Kapoor y A. Narayanan, ``Leakage and the reproducibility crisis in machine-learning-based science,'' \textit{Patterns}, vol. 4, no. 9, art. 100804, 2023, doi: 10.1016/j.patter.2023.100804.
+
+\bibitem{un2015} Asamblea General de las Naciones Unidas, ``Transformar nuestro mundo: la Agenda 2030 para el Desarrollo Sostenible,'' Resolución A/RES/70/1, 25 de sep. de 2015.
+
+\bibitem{un2008isic} Naciones Unidas, \textit{Clasificación Industrial Internacional Uniforme de todas las actividades económicas (CIIU), Rev. 4}, Informes estadísticos, Serie M, n.\textordmasculine{} 4, Rev. 4. Nueva York, NY, EE.\,UU.: Naciones Unidas, 2008.
+
+\bibitem{li2021} C.-L. Li, K. Sohn, J. Yoon y T. Pfister, ``CutPaste: Self-supervised learning for anomaly detection and localization,'' en \textit{Proc. IEEE/CVF Conf. Comput. Vis. Pattern Recognit. (CVPR)}, 2021, pp. 9664--9674.
+
+\bibitem{he2016} K. He, X. Zhang, S. Ren y J. Sun, ``Deep residual learning for image recognition,'' en \textit{Proc. IEEE Conf. Comput. Vis. Pattern Recognit. (CVPR)}, Las Vegas, NV, EE.\,UU., 2016, pp. 770--778.
+
+\bibitem{zagoruyko2016} S. Zagoruyko y N. Komodakis, ``Wide residual networks,'' en \textit{Proc. British Mach. Vis. Conf. (BMVC)}, York, Reino Unido, 2016, pp. 87.1--87.12.
+
+\bibitem{deng2009} J. Deng, W. Dong, R. Socher, L.-J. Li, K. Li y L. Fei-Fei, ``ImageNet: A large-scale hierarchical image database,'' en \textit{Proc. IEEE Conf. Comput. Vis. Pattern Recognit. (CVPR)}, Miami, FL, EE.\,UU., 2009, pp. 248--255.
+
+\bibitem{rippel2020} O. Rippel, P. Mertens y D. Merhof, ``Modeling the distribution of normal data in pre-trained deep features for anomaly detection,'' en \textit{Proc. 25th Int. Conf. Pattern Recognit. (ICPR)}, Milán, Italia, 2021, pp. 6726--6733.
+
+\bibitem{defard2021} T. Defard, A. Setkov, A. Loesch y R. Audigier, ``PaDiM: A patch distribution modeling framework for anomaly detection and localization,'' en \textit{Pattern Recognition. ICPR International Workshops and Challenges}, LNCS, vol. 12664. Cham, Suiza: Springer, 2021, pp. 475--489.
+
+\bibitem{perlin1985} K. Perlin, ``An image synthesizer,'' \textit{ACM SIGGRAPH Comput. Graph.}, vol. 19, no. 3, pp. 287--296, 1985.
+
+\bibitem{bergmann2020} P. Bergmann, M. Fauser, D. Sattlegger y C. Steger, ``Uninformed students: Student-teacher anomaly detection with discriminative latent embeddings,'' en \textit{Proc. IEEE/CVF Conf. Comput. Vis. Pattern Recognit. (CVPR)}, Seattle, WA, EE.\,UU., 2020, pp. 4183--4192.
+
+\bibitem{deng2022} H. Deng y X. Li, ``Anomaly detection via reverse distillation from one-class embedding,'' en \textit{Proc. IEEE/CVF Conf. Comput. Vis. Pattern Recognit. (CVPR)}, Nueva Orleans, LA, EE.\,UU., 2022, pp. 9737--9746.
+
+\bibitem{dosovitskiy2021} A. Dosovitskiy \textit{et al.}, ``An image is worth 16x16 words: Transformers for image recognition at scale,'' en \textit{Proc. Int. Conf. Learn. Represent. (ICLR)}, 2021.
+
+\bibitem{oquab2024} M. Oquab \textit{et al.}, ``DINOv2: Learning robust visual features without supervision,'' \textit{Trans. Mach. Learn. Res.}, 2024.
+
+\bibitem{darcet2024} T. Darcet, M. Oquab, J. Mairal y P. Bojanowski, ``Vision transformers need registers,'' en \textit{Proc. Int. Conf. Learn. Represent. (ICLR)}, Viena, Austria, 2024.
+
+\bibitem{akcay2022} S. Akcay, D. Ameln, A. Vaidya, B. Lakshmanan, N. Ahuja y U. Genc, ``Anomalib: A deep learning library for anomaly detection,'' en \textit{Proc. IEEE Int. Conf. Image Process. (ICIP)}, Burdeos, Francia, 2022, pp. 1706--1710.
+
+\bibitem{paez2026} A. F. Paez-Salas, ``Informe técnico de selección, costo computacional y protocolo de evaluación de arquitecturas para detección de anomalías en tapas industriales,'' Proyecto Integrador, ESPOL, Guayaquil, Ecuador, Inf. téc. v1.1, 11 de nov. de 2026.
+
+\bibitem{gebru2021} T. Gebru \textit{et al.}, ``Datasheets for datasets,'' \textit{Commun. ACM}, vol. 64, no. 12, pp. 86--92, 2021, doi: 10.1145/3458723.
+
+\bibitem{shorten2019} C. Shorten y T. M. Khoshgoftaar, ``A survey on image data augmentation for deep learning,'' \textit{J. Big Data}, vol. 6, art. 60, 2019, doi: 10.1186/s40537-019-0197-0.
+
+\bibitem{goodfellow2014} I. Goodfellow \textit{et al.}, ``Generative adversarial nets,'' en \textit{Advances in Neural Information Processing Systems}, vol. 27, 2014, pp. 2672--2680.
+
+\bibitem{ho2020} J. Ho, A. Jain y P. Abbeel, ``Denoising diffusion probabilistic models,'' en \textit{Advances in Neural Information Processing Systems}, vol. 33, 2020, pp. 6840--6851.
+
+\bibitem{pan2010} S. J. Pan y Q. Yang, ``A survey on transfer learning,'' \textit{IEEE Trans. Knowl. Data Eng.}, vol. 22, no. 10, pp. 1345--1359, 2010, doi: 10.1109/TKDE.2009.191.
+
+\bibitem{yosinski2014} J. Yosinski, J. Clune, Y. Bengio y H. Lipson, ``How transferable are features in deep neural networks?,'' en \textit{Advances in Neural Information Processing Systems}, vol. 27, 2014, pp. 3320--3328.
+
+\bibitem{saito2015} T. Saito y M. Rehmsmeier, ``The precision-recall plot is more informative than the ROC plot when evaluating binary classifiers on imbalanced datasets,'' \textit{PLoS ONE}, vol. 10, no. 3, art. e0118432, 2015, doi: 10.1371/journal.pone.0118432.
+
+\bibitem{pineau2021} J. Pineau \textit{et al.}, ``Improving reproducibility in machine learning research (A report from the NeurIPS 2019 reproducibility program),'' \textit{J. Mach. Learn. Res.}, vol. 22, no. 164, pp. 1--20, 2021.
+
+\bibitem{bouthillier2021} X. Bouthillier \textit{et al.}, ``Accounting for variance in machine learning benchmarks,'' en \textit{Proc. Mach. Learn. Syst. (MLSys)}, vol. 3, 2021, pp. 747--769.
+
+\bibitem{kendall1938} M. G. Kendall, ``A new measure of rank correlation,'' \textit{Biometrika}, vol. 30, no. 1/2, pp. 81--93, 1938, doi: 10.1093/biomet/30.1-2.81.
+
+\bibitem{montgomery2017} D. C. Montgomery, \textit{Design and Analysis of Experiments}, 9.\textordfeminine{} ed. Hoboken, NJ, EE.\,UU.: Wiley, 2017.
+
+\bibitem{redmon2016} J. Redmon, S. Divvala, R. Girshick y A. Farhadi, ``You only look once: Unified, real-time object detection,'' en \textit{Proc. IEEE Conf. Comput. Vis. Pattern Recognit. (CVPR)}, Las Vegas, NV, EE.\,UU., 2016, pp. 779--788.
+
+\bibitem{jeong2023} J. Jeong, Y. Zou, T. Kim, D. Zhang, A. Ravichandran y O. Dabeer, ``WinCLIP: Zero-/few-shot anomaly classification and segmentation,'' en \textit{Proc. IEEE/CVF Conf. Comput. Vis. Pattern Recognit. (CVPR)}, Vancouver, Canadá, 2023, pp. 19606--19616, doi: 10.1109/CVPR52729.2023.01878.
+
+\bibitem{zhou2024} Q. Zhou, G. Pang, Y. Tian, S. He y J. Chen, ``AnomalyCLIP: Object-agnostic prompt learning for zero-shot anomaly detection,'' en \textit{Proc. Int. Conf. Learn. Represent. (ICLR)}, Viena, Austria, 2024.
+
+\bibitem{guo2025supp} J. Guo \textit{et al.}, ``Dinomaly: The less is more philosophy in multi-class unsupervised anomaly detection. Supplementary material,'' en \textit{Proc. IEEE/CVF Conf. Comput. Vis. Pattern Recognit. (CVPR)}, 2025. [En línea]. Disponible en: \url{https://openaccess.thecvf.com/content/CVPR2025/supplemental/Guo_Dinomaly_The_Less_CVPR_2025_supplemental.pdf}
+
+\bibitem{cvatweb} CVAT.ai Corporation, ``CVAT: Computer Vision Annotation Tool,'' repositorio GitHub. [En línea]. Disponible en: \url{https://github.com/cvat-ai/cvat}. Accedido: 23 de nov. de 2026.
+
+\bibitem{cohen1960} J. Cohen, ``A coefficient of agreement for nominal scales,'' \textit{Educ. Psychol. Meas.}, vol. 20, no. 1, pp. 37--46, 1960.
+
+\bibitem{everingham2010} M. Everingham, L. Van Gool, C. K. I. Williams, J. Winn y A. Zisserman, ``The PASCAL visual object classes (VOC) challenge,'' \textit{Int. J. Comput. Vis.}, vol. 88, no. 2, pp. 303--338, 2010.
+
+\bibitem{paszke2019} A. Paszke \textit{et al.}, ``PyTorch: An imperative style, high-performance deep learning library,'' en \textit{Advances in Neural Information Processing Systems}, vol. 32, 2019, pp. 8024--8035.
+
+\bibitem{schluter2022} H. M. Schlüter, J. Tan, B. Hou y B. Kainz, ``Natural synthetic anomalies for self-supervised anomaly detection and localization,'' en \textit{Computer Vision -- ECCV 2022}. Cham, Suiza: Springer, 2022, doi: 10.1007/978-3-031-19821-2\_27.
+
+\bibitem{duan2023} Y. Duan, Y. Hong, L. Niu y L. Zhang, ``Few-shot defect image generation via defect-aware feature manipulation,'' en \textit{Proc. AAAI Conf. Artif. Intell.}, vol. 37, no. 1, 2023, pp. 571--578, doi: 10.1609/aaai.v37i1.25132.
+
+\bibitem{hu2024} T. Hu \textit{et al.}, ``AnomalyDiffusion: Few-shot anomaly image generation with diffusion model,'' en \textit{Proc. AAAI Conf. Artif. Intell.}, vol. 38, no. 8, 2024, pp. 8526--8534, doi: 10.1609/aaai.v38i8.28696.
+
+\bibitem{heusel2017} M. Heusel, H. Ramsauer, T. Unterthiner, B. Nessler y S. Hochreiter, ``GANs trained by a two time-scale update rule converge to a local Nash equilibrium,'' en \textit{Advances in Neural Information Processing Systems}, vol. 30, 2017, pp. 6626--6637.
+
+\bibitem{binkowski2018} M. Bi\'{n}kowski, D. J. Sutherland, M. Arbel y A. Gretton, ``Demystifying MMD GANs,'' en \textit{Proc. Int. Conf. Learn. Represent. (ICLR)}, Vancouver, Canadá, 2018.
+
+\bibitem{zhang2018} R. Zhang, P. Isola, A. A. Efros, E. Shechtman y O. Wang, ``The unreasonable effectiveness of deep features as a perceptual metric,'' en \textit{Proc. IEEE/CVF Conf. Comput. Vis. Pattern Recognit. (CVPR)}, Salt Lake City, UT, EE.\,UU., 2018, pp. 586--595.
+
+\bibitem{fawcett2006} T. Fawcett, ``An introduction to ROC analysis,'' \textit{Pattern Recognit. Lett.}, vol. 27, no. 8, pp. 861--874, 2006.
+
+\bibitem{efron1979} B. Efron, ``Bootstrap methods: Another look at the jackknife,'' \textit{Ann. Statist.}, vol. 7, no. 1, pp. 1--26, 1979.
+
+\bibitem{field2007} C. A. Field y A. H. Welsh, ``Bootstrapping clustered data,'' \textit{J. Roy. Statist. Soc. Ser. B}, vol. 69, no. 3, pp. 369--390, 2007, doi: 10.1111/j.1467-9868.2007.00593.x.
+
+\bibitem{merkel2014} D. Merkel, ``Docker: Lightweight Linux containers for consistent development and deployment,'' \textit{Linux J.}, vol. 2014, no. 239, art. 2, 2014.
+
+\bibitem{mitchell2019} M. Mitchell \textit{et al.}, ``Model cards for model reporting,'' en \textit{Proc. Conf. Fairness, Accountability, and Transparency (FAT*)}, Atlanta, GA, EE.\,UU., 2019, pp. 220--229.
+
+\bibitem{lopdp2021} Asamblea Nacional del Ecuador, \textit{Ley Orgánica de Protección de Datos Personales}, Registro Oficial 459, 26 de mayo de 2021.
+
+\bibitem{mvtecadweb} MVTec Software GmbH, ``The MVTec anomaly detection dataset (MVTec AD).'' [En línea]. Disponible en: \url{https://www.mvtec.com/company/research/datasets/mvtec-ad}. Accedido: 9 de nov. de 2026.
+
+\bibitem{anomalibweb} Open Edge Platform, ``Anomalib,'' repositorio GitHub. [En línea]. Disponible en: \url{https://github.com/open-edge-platform/anomalib}. Accedido: 9 de nov. de 2026.
+\end{thebibliography}
+\endgroup
+
+% =====================================================================
+%  APÉNDICES (sin numeración de página)
+% =====================================================================
+\clearpage
+\encabezado{Apéndices}
+
+\clearpage
+\phantomsection\addcontentsline{toc}{chapter}{Apéndice A. Configuración y entorno de ejecución}
+{\centering\bfseries Apéndice A\par}
+{\centering\bfseries Configuración y entorno de ejecución\par}
+
+Este apéndice detalla la configuración inicial de las arquitecturas, las reglas de ejecución, el registro del preflight, el entorno de \textit{software} y los criterios de aceptación de la etapa de arquitecturas definidos en el protocolo técnico \cite{paez2026}.
+
+\begin{table}[H]
+\singlespacing\setlength{\parindent}{0pt}\setlength{\RaggedRightParindent}{0pt}
+\caption{Configuración inicial de cada arquitectura}
+\label{tab:configuracion}
+\begin{tabularx}{\textwidth}{@{}>{\RaggedRight\arraybackslash}p{2.4cm}>{\RaggedRight\arraybackslash}X>{\RaggedRight\arraybackslash}p{4.4cm}@{}}
+\toprule
+Arquitectura & Configuración inicial & Acción si excede recursos \\
+\midrule
+PatchCore & Extractor Wide ResNet-50-2, capas 2 y 3, \textit{coreset} 0,10, FP32; solo normales reales & Reducir el \textit{coreset}; después, extractor más ligero \\
+EfficientAD-S & Variante S, lote de entrenamiento 1; profesor--estudiante y autocodificador sin cambios & Mantener S; revisar entrada y entorno \\
+DRAEM & Configuración de referencia de Anomalib con su síntesis interna & Reducir lote o resolución sin alterar la síntesis \\
+Dinomaly & Codificador DINOv2-R ViT-Base/14, lote 1, FP16 & Usar ViT-Small si no hay margen de memoria \\
+\bottomrule
+\end{tabularx}
+\nota{Elaborada a partir de \cite{paez2026,akcay2022}. El protocolo original de Dinomaly redimensiona la entrada a $448 \times 448$, la recorta a $392 \times 392$ y usa un decodificador de ocho bloques \cite{guo2025supp}.}
+\end{table}
+
+\begin{table}[H]
+\singlespacing\setlength{\parindent}{0pt}\setlength{\RaggedRightParindent}{0pt}
+\caption{Equipo de cómputo de referencia}
+\label{tab:hardware}
+\begin{tabularx}{\textwidth}{@{}>{\RaggedRight\arraybackslash}p{4cm}>{\RaggedRight\arraybackslash}X@{}}
+\toprule
+Componente & Recurso \\
+\midrule
+GPU & NVIDIA GeForce RTX 2080 Ti, 11 GB GDDR6, arquitectura Turing \\
+Procesador & Intel Core i9-10850K \\
+Memoria RAM & 16 GB \\
+Sistema operativo & Windows \\
+\bottomrule
+\end{tabularx}
+\nota{Tomada de \cite{paez2026}.}
+\end{table}
+
+\noindent\textbf{Reglas de ejecución.} Lote 1 en EfficientAD-S y Dinomaly; FP16 cuando aporte, sin diseñar el protocolo en torno a BF16; techo operativo de 9,5 a 10 GB de memoria de GPU; número limitado de procesos de carga de datos y \textit{coreset} en PatchCore para controlar la RAM; ejecución escalonada, con una corrida corta por arquitectura antes de la matriz; y separación entre exploración y resultados finales \cite{paez2026}.
+
+\noindent\textbf{Registro del preflight.} Cada arquitectura se prueba sobre una categoría pequeña de MVTec AD y registra: versiones de Python, PyTorch, CUDA, Anomalib y controladores; configuración, tamaño de lote y resolución; pico de memoria; tiempos de ajuste e inferencia; estado aprobado o fallido con su causa; y \textit{hash} de configuración y semilla.
+
+\noindent\textbf{Entorno de \textit{software}.} Entorno exclusivo con punto de partida Python 3.10 o 3.11, PyTorch 2.6.0, Torchvision 0.21.0, ruedas CUDA 12.4 y Anomalib 2.6.2 \cite{paez2026}. Tras la prueba de humo se congelan las versiones y se guardan el archivo de bloqueo, la salida de \texttt{pip freeze} y una imagen de contenedor Docker \cite{merkel2014}. Versiones finales: \pendiente{versiones}.
+
+\noindent\textbf{Criterios de aceptación de la etapa de arquitecturas} \cite{paez2026}:
+\begin{enumerate}[leftmargin=2cm]
+  \item las cuatro arquitecturas están instaladas y ejecutan ajuste e inferencia;
+  \item existe un archivo de configuración versionado por arquitectura;
+  \item el conjunto de tapas está identificado por versión y \textit{hash};
+  \item no existe fuga entre TRAIN, VAL y TEST por pieza, lote o sesión;
+  \item TEST permanece bloqueado y exclusivamente real;
+  \item cada corrida registra memoria, tiempo, semilla y \textit{software};
+  \item las comparaciones con la literatura usan configuraciones equivalentes o explican la desviación;
+  \item las modificaciones de un método se nombran como variantes.
+\end{enumerate}
+
+\end{document}
