@@ -37,7 +37,7 @@ El evaluador cronometra el modelo PyTorch con lote 1, diez llamadas de calentami
 | --- | --- |
 | E2 | `evaluation/03-ablations.ipynb`. Compara 10, 25, 50 y 100 % de las normales con subconjuntos anidados por semilla. Registra las imágenes usadas y compara primero en VAL. |
 | E3 | `models/draem-ref/synthetic-study.ipynb`. Audita procedencia, máscaras y cobertura de defectos de los pares sintéticos. Adjunta la revisión visual de realismo y diversidad. |
-| E4 | El mismo cuaderno entrena `draem-project` y opcionalmente `draem-mixed`. En la rama del proyecto, cada normal con un par disponible tiene 50 % de probabilidad de recibir un defecto generado. En la mixta, primero se elige con probabilidad 0,5 la rama procedural. Documenta la cobertura efectiva de normales con pares. Congela las corridas y calcula deltas por semilla frente a DRAEM-Ref con el mismo TEST. |
+| E4 | El mismo cuaderno entrena `draem-project` y opcionalmente `draem-mixed`. Todas las variantes ven una anomalía en el 50 % de los pasos, igual que DRAEM-Ref, para que el delta mida el tipo de anomalía y no su cantidad. En la rama del proyecto, la anomalía es un par generado elegido al azar y el objetivo de reconstrucción es su tapa original. En la mixta, la mitad de esas anomalías es procedural y la otra mitad son pares. Congela las corridas y calcula deltas por semilla frente a DRAEM-Ref con el mismo TEST. |
 | E5 | `evaluation/03-ablations.ipynb`. Compara aumento horizontal activado/desactivado usando todas las normales. Documenta por qué la simetría es válida para la cámara. |
 | E7 | `evaluation/04-robustness.ipynb`. Desglosa el TEST ya evaluado por grupo de adquisición, con conteos y errores. Los grupos con ambas clases admiten AUROC. |
 
