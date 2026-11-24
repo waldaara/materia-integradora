@@ -4,7 +4,7 @@
 
 Guarda los documentos en PDF o Markdown según su propósito.
 
-- [Contexto](docs/context/). La propuesta de tesis describe el problema, los objetivos y el alcance del estudio. El protocolo define cómo seleccionar y evaluar las arquitecturas.
+- [Contexto](docs/context/). La propuesta de tesis describe el problema, los objetivos y el alcance del estudio. El protocolo define cómo seleccionar y evaluar las arquitecturas. La guía IEEEtran HOWTO fija el formato del paper.
 - [Informes](docs/reports/). Aquí se registran avances y resultados parciales, como el recuento de imágenes revisadas y los tipos de anomalías encontrados en las tapas.
 
 ## Reproducir los experimentos
